@@ -1,0 +1,30 @@
+dist: xenial
+language: go
+go:
+- 1.11.5
+services:
+- docker
+sudo: required
+env:
+  global:
+  - CHANGE_MINIKUBE_NONE_USER=true
+  - MINIKUBE_WANTREPORTERRORPROMPT=false
+  - MINIKUBE_WANTUPDATENOTIFICATION=false
+  - KUBECONFIG=/home/travis/.kube/config
+before_script: cd build
+jobs:
+  include:
+  - stage: Unit Test with Code Coverage of Citrix Node Controller
+    script:
+    - make coverage
+    - bash <(curl -s https://codecov.io/bash)
+  - stage: Build Citrix Node Controller and publish the image.
+    script:
+    - make build
+    - make publish
+notifications:
+  slack:
+    secure: qQ7SjRQN+qQXRYJQ8p27fNjDoDrzXGIzsnjhBbPFcMhGUYxleXuhHM4g9dlaibZbGDJW/JCsaNxsvgCxuLdZ/Ihi/Z6iP1yLYXnGHGnK8oHQ6fvghRzskqayH5BRDvyNlXikXXAlSUgEjrCirWRmBK4MC0UWCEudxCakjbCO6TfoihtTaJ4381icGl4yUNsryj/puPRcEY03d643tD65nyNhUeLNK4+/wAne0ggU6LDcK+vob0xjKkzKiRJRdDdWvqXH/GJ9WIEdGZz6c76O4jH6swNil34RYEPtUloHpzsIlmemWD2CF6UiIWkIBgTo8d+LaYq/e2UFMoO+JZP1bRBUPLAsvx338u3RGAU0tITENPaQRL7qn0obPYf2oaUIAA2P/D8lTULc3qOVTLvOm7KEYQSQunv9LjuUxOXPuCaxowtYGurt11+CBXKnUgXDfnqvEBdCrP3rFYyrheKECHsjzokWEFS4Q8Oj3EqOjp2l2maCOfcSF7Wt1ZMJFFMkGjgoHBksK6wQOVxSgGKLfatZn3IDRS/ROcer0c8AHU8sAHsADg4HdwOe1/4DXai+voyvQZ3UrlkCefM/pjQMfc9JIk0rfNrxJFWHOeh60plCZcNvrPvdl5tUPIcvIWa3PFljtc6R0yAuKvN9i/mOSa5YN6CDWFC0/uPXyWbepPk=
+    template:
+      - "%{repository_slug} (%{commit}) : %{message}"
+      - "Build details: %{build_url}"
