@@ -1,13 +1,13 @@
 # Deploy the Citrix k8s node controller
 
-Citrix k8s node controller is controlled using a [config map](https://github.com/janraj/citrix-k8s-node-controller/blob/master/deploy/config_map.yaml). The [config map](https://github.com/janraj/citrix-k8s-node-controller/blob/master/deploy/config_map.yaml) file contains a `data.operation:` field that you can use to define Citrix k8s node controller to automatically create, apply, and delete routing configuration on Citrix ADC. You can use the following values for the `data.operation:` field:
+Citrix k8s node controller is controlled using a [config map](https://github.com/citrix/citrix-k8s-node-controller/blob/master/deploy/config_map.yaml). The [config map](https://github.com/citrix/citrix-k8s-node-controller/blob/master/deploy/config_map.yaml) file contains a `data.operation:` field that you can use to define Citrix k8s node controller to automatically create, apply, and delete routing configuration on Citrix ADC. You can use the following values for the `data.operation:` field:
 
 | **Value** | **Description** |
 | ----- | ----------- |
 | ADD | Citrix k8s node controller creates a routing configuration on the Citrix ADC instance. |
 | DELETE | Citrix k8s node controller deletes the routing configuration on the Citrix ADC instance. |
 
-[config_map.yaml](https://github.com/janraj/citrix-k8s-node-controller/blob/master/deploy/config_map.yaml):
+[config_map.yaml](https://github.com/citrix/citrix-k8s-node-controller/blob/master/deploy/config_map.yaml):
 
 ```yaml
 apiVersion: v1
@@ -32,7 +32,7 @@ Perform the following:
 
 1.  Download the `citrix-k8s-node-controller.yaml` deployment file using the following command:
 
-        wget  https://raw.githubusercontent.com/janraj/citrix-k8s-node-controller/master/deploy/citrix-k8s-node-controller.yaml
+        wget  https://raw.githubusercontent.com/citrix/citrix-k8s-node-controller/master/deploy/citrix-k8s-node-controller.yaml
 
     The deployment file contains definitions for the following:
 
@@ -64,6 +64,6 @@ Perform the following:
 
         kubectl create -f citrix-k8s-node-controller.yaml
 
-1.  Apply the [config map](https://github.com/janraj/citrix-k8s-node-controller/blob/master/deploy/config_map.yaml) using the following command:
+1.  Apply the [config map](https://github.com/citrix/citrix-k8s-node-controller/blob/master/deploy/config_map.yaml) using the following command:
 
-        kubectl apply -f https://raw.githubusercontent.com/janraj/citrix-k8s-node-controller/master/deploy/config_map.yaml
+        kubectl apply -f https://raw.githubusercontent.com/citrix/citrix-k8s-node-controller/master/deploy/config_map.yaml

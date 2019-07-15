@@ -95,7 +95,7 @@ Perform the following:
 
 1.  Deploy the config map using the following command:
 
-        kubectl apply -f https://raw.githubusercontent.com/janraj/citrix-k8s-node-controller/master/deploy/config_map.yaml
+        kubectl apply -f https://raw.githubusercontent.com/citrix/citrix-k8s-node-controller/master/deploy/config_map.yaml
 
 ### Using Citrix k8s node controller as a microservice
 
