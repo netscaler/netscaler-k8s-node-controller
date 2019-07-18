@@ -17,14 +17,10 @@ Citrix k8s node controller is deployed as a pod in Kubernetes cluster that provi
 
 ## Contents
 
-+ [Citrix k8s node controller](#Citrix-k8s-node-controller)
-  + [Contents](#Contents)
   + [Overview](#Overview)
   + [Architecture](#Architecture)
   + [How it works](#How-it-works)
   + [Get started](#Get-started)
-    + [Using Citrix k8s node controller as a pod](#Using-Citrix-k8s-node-controller-as-a-pod)
-    + [Using Citrix k8s node controller as a process](#Using-Citrix-k8s-node-controller-as-a-process)
   + [Questions](#Questions)
   + [Issues](#Issues)
   + [Code of conduct](#Code-of-conduct)
