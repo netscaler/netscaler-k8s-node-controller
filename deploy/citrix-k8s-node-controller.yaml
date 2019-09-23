@@ -11,16 +11,12 @@ metadata:
   name: citrix-node-controller
 rules:
   - apiGroups: ["*"]
-    resources: ["daemonsets", "nodes", "configmaps", "pods"]
-    verbs: ["get", "list", "watch", "create", "patch"]
+    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts", "clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
 
   - apiGroups: [""]
-    resources: ["daemonsets", "nodes", "configmaps", "pods"]
-    verbs: ["get", "list", "watch", "create", "patch"]
-
-  - apiGroups: ["extensions"]
-    resources: ["daemonsets", "ingresses/status"]
-    verbs: ["get", "list", "watch", "create"]
+    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts", "clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -74,20 +70,26 @@ spec:
       serviceAccountName: citrix-node-controller
       containers:
       - name: citrix-node-controller
-        image: "quay.io/citrix/citrix-k8s-node-controller:latest"
+        image: "quay.io/citrix/citrix-k8s-node-controller:beta-v3"
         imagePullPolicy: Always
         env:
         - name: NS_IP
           value: "xxxxxxx"
         - name: NS_USER
-          value: "xxxxx"
+          valueFrom:
+            secretKeyRef:
+             name: nslogin
+             key: username
         - name: NS_PASSWORD
-          value: "xxxxx"
-        - name: NS_POD_CIDR
-          value: "xxx.xxx.xxx.xxx/xx"
-        - name: NODE_CNI_CIDR
-          value: "xxx.xxx.xxx.xxx/xx"
-        - name: NS_VTEP_MAC
-          value: "xx:xx:xx:xx:xx:xx"
-        - name: NS_NETPROFILE
-          value: "xxxxx"
+          valueFrom:
+            secretKeyRef:
+             name: nslogin
+             key: password
+        - name: NETWORK
+          value: "192.168.1.0/24"
+        - name: REMOTE_VTEPIP
+          value: "10.102.33.209"
+        - name: VXLAN_PORT
+          value: "8472"
+        - name: VNID
+          value: "200"

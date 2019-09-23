@@ -1,11 +1,11 @@
 package main
 
 import (
-	"testing"
+	"github.com/stretchr/testify/assert"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/stretchr/testify/assert"
 	"os"
+	"testing"
 	//"fmt"
 )
 
@@ -26,7 +26,7 @@ func TestFetchCitrixNodeControllerInput(t *testing.T) {
 				t.Errorf("FetchCitrixNodeControllerInput should have panicked!")
 			}
 		}()
-		// This function should cause a panic 
+		// This function should cause a panic
 		FetchCitrixNodeControllerInput()
 	}()
 
@@ -38,7 +38,7 @@ func TestFetchCitrixNodeControllerInput(t *testing.T) {
 	FetchCitrixNodeControllerInput()
 }
 
-func TestWaitForConfigMapInput(t *testing.T){
+func TestWaitForConfigMapInput(t *testing.T) {
 	input, _, api := getClientAndDeviceInfo()
 	api.Client.CoreV1().ConfigMaps("citrix").Create(&v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{Name: "citrix-node-controller"},
@@ -46,14 +46,15 @@ func TestWaitForConfigMapInput(t *testing.T){
 	})
 	WaitForConfigMapInput(api, input)
 }
+
 /*
 func TestMonitorIngressDevice(t *testing.T){
 	controllerInput := FetchCitrixNodeControllerInput()
         ingressDevice := createIngressDeviceClient(controllerInput)
-	
+
 	MonitorIngressDevice(ingressDevice, controllerInput)
 }*/
-func TestIsValidIP4(t *testing.T){
+func TestIsValidIP4(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal(false, IsValidIP4("333.22.1.1"), "Invalid IP")
 	assert.Equal(false, IsValidIP4("abc.22.1.1"), "Invalid IP")
