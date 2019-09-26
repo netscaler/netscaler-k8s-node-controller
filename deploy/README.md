@@ -42,13 +42,13 @@ Perform the following:
 
 # Verify the deployment
 
-After you have deployed the Citrix Node Controller, you can verify if Citrix Node Controller has configured a route on the Citrix ADC. 
+After you have deployed the Citrix node controller, you can verify if Citrix node controller has configured a route on the Citrix ADC. 
 
-To verify, log on to the Citrix ADC and use the following commands to verify the VXLAN VNID, VXLAN PORT, SNIP, route, and ARP configured by CNC on the Citrix ADC:
+To verify, log on to the Citrix ADC and use the following commands to verify the VXLAN VNID, VXLAN PORT, SNIP, route, and ARP configured by Citrix node controller  on the Citrix ADC:
 
 ![Verification](../images/verify.png)
 
-The highlights in the screenshot show the VXLAN VNID, VXLAN PORT, SNIP, route, and ARP configured by CNC on the Citrix ADC.
+The highlights in the screenshot show the VXLAN VNID, VXLAN PORT, SNIP, route, and ARP configured by Citrix node controller on the Citrix ADC.
 
 # Delete the Citrix K8s node controller 
 
