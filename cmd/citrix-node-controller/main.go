@@ -6,7 +6,7 @@ import (
 
 func InitCitrixNodeController() error {
 	klog.InitFlags(nil)
-	klog.Info("Initializing CNC")
+	klog.Info("[INFO] Initializing CNC")
 	InitPrefixMaskTable()
 	return nil
 }
