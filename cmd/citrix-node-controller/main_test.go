@@ -10,4 +10,5 @@ func TestMain(t *testing.T) {
 	if error != nil {
 		t.Error("Expected non error case")
 	}
+	//go StartCitrixNodeController()
 }

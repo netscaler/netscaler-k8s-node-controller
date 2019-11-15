@@ -1,8 +1,8 @@
 package main
 
 import (
-	"crypto/tls"
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,9 +35,9 @@ func NewNitroClient(obj *ControllerInput) *NitroClient {
 	c.username = obj.IngressDeviceUsername
 	c.password = obj.IngressDevicePassword
 	transport := &http.Transport{
-                TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-        }
-        c.client = &http.Client{Transport: transport}
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	c.client = &http.Client{Transport: transport}
 	return c
 }
 
@@ -60,7 +60,7 @@ func createResponseHandler(resp *http.Response) ([]byte, error) {
 		"404 Not Found", "405 Method Not Allowed", "406 Not Acceptable",
 		"503 Service Unavailable", "599 Netscaler specific error":
 		body, _ := ioutil.ReadAll(resp.Body)
-		klog.Info("[INFO] go-nitro: error = " + string(body))
+		klog.Info("[INFO] GO-NITRO: error = " + string(body))
 		return body, errors.New("failed: " + resp.Status + " (" + string(body) + ")")
 	default:
 		body, err := ioutil.ReadAll(resp.Body)
@@ -97,19 +97,19 @@ func (c *NitroClient) doHTTPRequest(method string, url string, bytes *bytes.Buff
 	if err != nil {
 		return []byte{}, err
 	}
-	klog.Info("[DEBUG] go-nitro: response Status:", resp.Status)
+	klog.Info("[DEBUG] GO-NITRO: response Status:", resp.Status)
 	return respHandler(resp)
 }
 
 func (c *NitroClient) createResource(resourceType string, resourceJSON []byte, operation string) ([]byte, error) {
-	klog.Info("[DEBUG] go-nitro: Creating resource of type ", resourceType)
+	klog.Info("[DEBUG] GO-NITRO: Creating resource of type ", resourceType)
 	url := c.url + resourceType
-	if (operation == "unset") {
-		url = url + "?action=unset"	
-	}else if strings.Contains(resourceType, "netprofile") {
-                url = url + "?idempotent=yes"
-        }
-	klog.Info("[TRACE] go-nitro: url is ", url)
+	if operation == "unset" {
+		url = url + "?action=unset"
+	} else if strings.Contains(resourceType, "netprofile") {
+		url = url + "?idempotent=yes"
+	}
+	klog.Info("[TRACE] GO-NITRO: url is ", url)
 	return c.doHTTPRequest("POST", url, bytes.NewBuffer(resourceJSON), createResponseHandler)
 }
 
@@ -120,14 +120,14 @@ func (c *NitroClient) AddResource(resourceType string, name string, resourceStru
 
 	resourceJSON, err := JSONMarshal(nsResource)
 	if err != nil {
-		return "", fmt.Errorf("[ERROR] go-nitro: Failed to create resource of type %s, name=%s, err=%s", resourceType, name, err)
+		return "", fmt.Errorf("[ERROR] GO-NITRO: Failed to create resource of type %s, name=%s, err=%s", resourceType, name, err)
 	}
 
-	klog.Info("[TRACE] go-nitro: Resourcejson is " + string(resourceJSON))
+	klog.Info("[TRACE] GO-NITRO: Resourcejson is " + string(resourceJSON))
 
 	body, err := c.createResource(resourceType, resourceJSON, operation)
 	if err != nil {
-		return "", fmt.Errorf("[ERROR] go-nitro: Failed to create resource of type %s, name=%s, err=%s", resourceType, name, err)
+		return "", fmt.Errorf("[ERROR] GO-NITRO: Failed to create resource of type %s, name=%s, err=%s", resourceType, name, err)
 	}
 	_ = body
 
@@ -145,7 +145,7 @@ type Vxlan struct {
 type Vxlan_srcip_binding struct {
 	Id        int    `json:"id,omitempty"`
 	Ipaddress string `json:"ipaddress,omitempty"`
-	Srcip     string `json:"srcip",omitempty"`
+	Srcip     string `json:"srcip,omitempty"`
 	Netmask   string `json:"netmask,omitempty"`
 }
 type Route struct {
@@ -158,7 +158,7 @@ type Nsip struct {
 	Netmask   string `json:"netmask,omitempty"`
 }
 type Netprofile struct {
-	Name string `json:"name,omitempty"`
+	Name  string `json:"name,omitempty"`
 	Srcip string `json:"ipaddress,omitempty"`
 }
 
@@ -199,7 +199,7 @@ func createIngressDeviceClient(input *ControllerInput) *NitroClient {
 	return client
 }
 func AddIngressDeviceConfig(config *ConfigPack, client *NitroClient) {
-	for ind, _ := range config.keys {
+	for ind := range config.keys {
 		result, err := client.AddResource(config.keys[ind], "ADD", config.items[config.keys[ind]], "add")
 		if err != nil {
 			fmt.Println("Result  err ", result, err)
@@ -207,19 +207,19 @@ func AddIngressDeviceConfig(config *ConfigPack, client *NitroClient) {
 	}
 }
 
-func BindToNetProfile(controllerInput *ControllerInput, client *NitroClient){
+func BindToNetProfile(controllerInput *ControllerInput, client *NitroClient) {
 	var args = map[string]string{"name": controllerInput.IngressDeviceNetprof, "srcip": controllerInput.IngressDevicePodIP}
 	result, err := client.AddResource("netprofile", "UPDATE", args, "set")
 	fmt.Println("Result  netprofile ", result, err)
 }
-func UnBindNetProfile(controllerInput *ControllerInput, client *NitroClient){
+func UnBindNetProfile(controllerInput *ControllerInput, client *NitroClient) {
 	var args = map[string]string{"name": controllerInput.IngressDeviceNetprof, "srcip": "true"}
 	result, err := client.AddResource("netprofile", "UNSET", args, "unset")
 	fmt.Println("Result  netprofile ", result, err)
 }
 
 func DeleteIngressDeviceConfig(config *ConfigPack, client *NitroClient) {
-	for ind, _ := range config.keys {
+	for ind := range config.keys {
 		err := client.DeleteResourceWithArgsMap(config.keys[ind], "", config.items[config.keys[ind]].(map[string]string))
 		if err != nil {
 			fmt.Println("Err ", err)
@@ -238,7 +238,7 @@ func DeleteIngressDeviceConfig(config *ConfigPack, client *NitroClient) {
 func NsInterfaceAddRoute(client *NitroClient, input *ControllerInput, node *Node) {
 	configPack := ConfigPack{}
 	route := Route{
-		Network: node.PodAddress,
+		Network: node.PodNetwork,
 		Netmask: node.PodNetMask,
 		Gateway: node.PodAddress,
 	}
@@ -251,11 +251,16 @@ func NsInterfaceAddRoute(client *NitroClient, input *ControllerInput, node *Node
 		Vtep:      node.IPAddr,
 	}
 	configPack.Set("arp", &arp)
+	node.PodAddress = ""
+	fmt.Println("Removing if same Network and Netmask present in NS")
+	NsInterfaceDeleteRoute(client, node)
+	node.PodAddress = route.Gateway
 	AddIngressDeviceConfig(&configPack, client)
 }
 
-func NsInterfaceDeleteRoute(client *NitroClient, obj *ControllerInput, nodeinfo *Node) {
-	var argsBundle = map[string]string{"network": nodeinfo.PodAddress, "netmask": nodeinfo.PodNetMask, "gateway": nodeinfo.PodAddress}
+func NsInterfaceDeleteRoute(client *NitroClient, nodeinfo *Node) {
+	var argsBundle = map[string]string{"network": nodeinfo.PodNetwork, "netmask": nodeinfo.PodNetMask, "gateway": nodeinfo.PodAddress}
+
 	err2 := client.DeleteResourceWithArgsMap("route", "", argsBundle)
 	if err2 != nil {
 		fmt.Println(err2)
@@ -267,6 +272,7 @@ func NsInterfaceDeleteRoute(client *NitroClient, obj *ControllerInput, nodeinfo 
 	}
 
 }
+
 func (ingressDevice *NitroClient) GetVxlanConfig(controllerInput *ControllerInput) {
 	klog.Info("GetVxlanConfig")
 }
@@ -276,19 +282,19 @@ func (c *NitroClient) DeleteResourceWithArgsMap(resourceType string, resourceNam
 
 	_, err := c.listResourceWithArgsMap(resourceType, resourceName, args)
 	if err == nil { // resource exists
-		klog.Infof("[INFO] go-nitro: DeleteResource found resource of type %s: %s", resourceType, resourceName)
+		klog.Infof("[INFO] GO-NITRO: DeleteResource found resource of type %s: %s", resourceType, resourceName)
 		_, err = c.deleteResourceWithArgsMap(resourceType, resourceName, args)
 		if err != nil {
-			klog.Errorf("[ERROR] go-nitro: Failed to delete resourceType %s: %s, err=%s", resourceType, resourceName, err)
+			klog.Errorf("[ERROR] GO-NITRO: Failed to delete resourceType %s: %s, err=%s", resourceType, resourceName, err)
 			return err
 		}
 	} else {
-		klog.Infof("[INFO] go-nitro: Resource %s already deleted ", resourceName)
+		klog.Infof("[INFO] GO-NITRO: Resource %s already deleted ", resourceName)
 	}
 	return nil
 }
 func (c *NitroClient) deleteResourceWithArgs(resourceType string, resourceName string, args []string) ([]byte, error) {
-	klog.Info("[DEBUG] go-nitro: Deleting resource of type ", resourceType, "with args ", args)
+	klog.Info("[DEBUG] GO-NITRO: Deleting resource of type ", resourceType, "with args ", args)
 	var url string
 	if resourceName != "" {
 		url = c.url + fmt.Sprintf("%s/%s?args=", resourceType, resourceName)
@@ -296,7 +302,7 @@ func (c *NitroClient) deleteResourceWithArgs(resourceType string, resourceName s
 		url = c.url + fmt.Sprintf("%s?args=", resourceType)
 	}
 	url = url + strings.Join(args, ",")
-	klog.Info("[TRACE] go-nitro: url is ", url)
+	klog.Info("[TRACE] GO-NITRO: url is ", url)
 
 	return c.doHTTPRequest("DELETE", url, bytes.NewBuffer([]byte{}), deleteResponseHandler)
 
@@ -323,7 +329,7 @@ func (c *NitroClient) listResourceWithArgsMap(resourceType string, resourceName 
 
 }
 func (c *NitroClient) listResourceWithArgs(resourceType string, resourceName string, args []string) ([]byte, error) {
-	klog.Info("[DEBUG] go-nitro: listing resource of type ", resourceType, ", name: ", resourceName, ", args:", args)
+	klog.Info("[DEBUG] GO-NITRO: listing resource of type ", resourceType, ", name: ", resourceName, ", args:", args)
 	var url string
 
 	if resourceName != "" {
@@ -333,11 +339,11 @@ func (c *NitroClient) listResourceWithArgs(resourceType string, resourceName str
 	}
 	strArgs := strings.Join(args, ",")
 	url2 := url + "?args=" + strArgs
-	klog.Info("[TRACE] go-nitro: url is ", url)
+	klog.Info("[TRACE] GO-NITRO: url is ", url)
 
 	data, err := c.doHTTPRequest("GET", url2, bytes.NewBuffer([]byte{}), readResponseHandler)
 	if err != nil {
-		klog.Info("[DEBUG] go-nitro: error listing with args, trying filter")
+		klog.Info("[DEBUG] GO-NITRO: error listing with args, trying filter")
 		url2 = url + "?filter=" + strArgs
 		return c.doHTTPRequest("GET", url2, bytes.NewBuffer([]byte{}), readResponseHandler)
 	}
@@ -351,17 +357,17 @@ func readResponseHandler(resp *http.Response) ([]byte, error) {
 		return body, nil
 	case "404 Not Found":
 		body, _ := ioutil.ReadAll(resp.Body)
-		klog.Info("[DEBUG] go-nitro: read: 404 not found")
-		return body, errors.New("go-nitro: read: 404 not found: ")
+		klog.Info("[DEBUG] GO-NITRO: read: 404 not found")
+		return body, errors.New("GO-NITRO: read: 404 not found: ")
 	case "400 Bad Request", "401 Unauthorized", "403 Forbidden",
 		"405 Method Not Allowed", "406 Not Acceptable",
 		"409 Conflict", "503 Service Unavailable", "599 Netscaler specific error":
 		body, _ := ioutil.ReadAll(resp.Body)
-		klog.Info("[INFO] go-nitro: read: error = " + string(body))
-		return body, errors.New("[INFO] go-nitro: failed read: " + resp.Status + " (" + string(body) + ")")
+		klog.Info("[INFO] GO-NITRO: read: error = " + string(body))
+		return body, errors.New("[INFO] GO-NITRO: failed read: " + resp.Status + " (" + string(body) + ")")
 	default:
 		body, err := ioutil.ReadAll(resp.Body)
-		klog.Info("[INFO] go-nitro: read error = " + string(body))
+		klog.Info("[INFO] GO-NITRO: read error = " + string(body))
 		return body, err
 
 	}
@@ -376,7 +382,7 @@ func deleteResponseHandler(resp *http.Response) ([]byte, error) {
 		"405 Method Not Allowed", "406 Not Acceptable",
 		"409 Conflict", "503 Service Unavailable", "599 Netscaler specific error":
 		body, _ := ioutil.ReadAll(resp.Body)
-		klog.Info("[INFO] go-nitro: delete: error = " + string(body))
+		klog.Info("[INFO] GO-NITRO: delete: error = " + string(body))
 		return body, errors.New("[INFO] delete failed: " + resp.Status + " (" + string(body) + ")")
 	default:
 		body, err := ioutil.ReadAll(resp.Body)
@@ -385,137 +391,136 @@ func deleteResponseHandler(resp *http.Response) ([]byte, error) {
 	}
 }
 
-func getNetScalerDefaultGateway(IngressDeviceClient *NitroClient) string{
-	var data map[string]interface{}        
+func getNetScalerDefaultGateway(IngressDeviceClient *NitroClient) string {
+	var data map[string]interface{}
 	url := IngressDeviceClient.url + "route"
-        url = url + "?args=network:0.0.0.0,netmask:0.0.0.0"
+	url = url + "?args=network:0.0.0.0,netmask:0.0.0.0"
 
 	result, err := IngressDeviceClient.doHTTPRequest("GET", url, bytes.NewBuffer([]byte{}), readResponseHandler)
 	if err != nil {
-		klog.Info("[DEBUG] go-nitro: error listing with args, trying filter")
+		klog.Info("[DEBUG] GO-NITRO: error listing with args, trying filter")
 		return "error"
 	}
-        if err = json.Unmarshal(result, &data); err != nil {
-                klog.Info("[ERROR] go-nitro: FindResourceArray: Failed to unmarshal Netscaler Response!", err, data)
+	if err = json.Unmarshal(result, &data); err != nil {
+		klog.Info("[ERROR] GO-NITRO: FindResourceArray: Failed to unmarshal Netscaler Response!", err, data)
 		return "error"
-        }
-        rsrcs, ok := data["route"]
-        if !ok || rsrcs == nil {
+	}
+	rsrcs, ok := data["route"]
+	if !ok || rsrcs == nil {
 		klog.Info("[ERROR]")
 		return "error"
-        }
-        resources := data["route"].([]interface{})
-        ret := make([]map[string]interface{}, len(resources), len(resources))
-        for i, v := range resources {
-                ret[i] = v.(map[string]interface{})
-        }
+	}
+	resources := data["route"].([]interface{})
+	ret := make([]map[string]interface{}, len(resources), len(resources))
+	for i, v := range resources {
+		ret[i] = v.(map[string]interface{})
+	}
 	var gateway string = ret[0]["gateway"].(string)
-        log.Println("[INFO] gateway", gateway)
+	log.Println("[INFO] gateway", gateway)
 	return gateway
 }
 
-func getDefaultDatewayInterface(IngressDeviceClient *NitroClient, gateway string) string{
-	var arpdata map[string]interface{}        
+func getDefaultDatewayInterface(IngressDeviceClient *NitroClient, gateway string) string {
+	var arpdata map[string]interface{}
 	url := IngressDeviceClient.url + "arp"
 	arg := fmt.Sprintf("IPAddress:%s", gateway)
-        url = url + "?filter=" + arg
+	url = url + "?filter=" + arg
 
 	result, err := IngressDeviceClient.doHTTPRequest("GET", url, bytes.NewBuffer([]byte{}), readResponseHandler)
 	if err != nil {
-		log.Println("[DEBUG] go-nitro: error listing with args, trying filter")
+		log.Println("[DEBUG] GO-NITRO: error listing with args, trying filter")
 	}
-        if err = json.Unmarshal(result, &arpdata); err != nil {
-                klog.Info("[ERROR] go-nitro: FindResourceArray: Failed to unmarshal Netscaler Response!", err, arpdata)
+	if err = json.Unmarshal(result, &arpdata); err != nil {
+		klog.Info("[ERROR] GO-NITRO: FindResourceArray: Failed to unmarshal Netscaler Response!", err, arpdata)
 		return "error"
-        }
-        rsrcs, ok := arpdata["arp"]
-        if !ok || rsrcs == nil {
+	}
+	rsrcs, ok := arpdata["arp"]
+	if !ok || rsrcs == nil {
 		log.Printf("[ERROR]")
-                return "error"
-        }
-        resources := arpdata["arp"].([]interface{})
-        ret := make([]map[string]interface{}, len(resources), len(resources))
-        for i, v := range resources {
-                ret[i] = v.(map[string]interface{})
-        }
-        ifnum := ret[0]["ifnum"].(string)
-        log.Println("[INFO ifnum]", ifnum)
+		return "error"
+	}
+	resources := arpdata["arp"].([]interface{})
+	ret := make([]map[string]interface{}, len(resources), len(resources))
+	for i, v := range resources {
+		ret[i] = v.(map[string]interface{})
+	}
+	ifnum := ret[0]["ifnum"].(string)
+	log.Println("[INFO ifnum]", ifnum)
 	return ifnum
 }
 
-func getInterfaceMac(IngressDeviceClient *NitroClient, ifnum string) string{
-	var ifdata map[string]interface{}        
+func getInterfaceMac(IngressDeviceClient *NitroClient, ifnum string) string {
+	var ifdata map[string]interface{}
 	url := IngressDeviceClient.url + "Interface"
 	ifnums := strings.Split(ifnum, "/")
-        url = url + "/"+ifnums[0]+"%252F"+ifnums[1]
+	url = url + "/" + ifnums[0] + "%252F" + ifnums[1]
 
 	result, err := IngressDeviceClient.doHTTPRequest("GET", url, bytes.NewBuffer([]byte{}), readResponseHandler)
 	if err != nil {
-		log.Println("[DEBUG] go-nitro: error listing with args, trying filter")
+		log.Println("[DEBUG] GO-NITRO: error listing with args, trying filter")
 	}
-        if err = json.Unmarshal(result, &ifdata); err != nil {
-                klog.Info("[ERROR] go-nitro: FindResourceArray: Failed to unmarshal Netscaler Response!", err, ifdata)
+	if err = json.Unmarshal(result, &ifdata); err != nil {
+		klog.Info("[ERROR] GO-NITRO: FindResourceArray: Failed to unmarshal Netscaler Response!", err, ifdata)
 		return "error"
-        }
-        rsrcs, ok := ifdata["Interface"]
-        if !ok || rsrcs == nil {
+	}
+	rsrcs, ok := ifdata["Interface"]
+	if !ok || rsrcs == nil {
 		log.Printf("[ERROR]")
-                return "error"
-        }
-        resources := ifdata["Interface"].([]interface{})
-        ret := make([]map[string]interface{}, len(resources), len(resources))
-        for i, v := range resources {
-                ret[i] = v.(map[string]interface{})
-        }
-	mac:= ret[0]["mac"].(string)
-	vmac:= ret[0]["vmac"].(string)
-        log.Println("[INFO MAC]=", mac, "\t VMAC=",vmac)
+		return "error"
+	}
+	resources := ifdata["Interface"].([]interface{})
+	ret := make([]map[string]interface{}, len(resources), len(resources))
+	for i, v := range resources {
+		ret[i] = v.(map[string]interface{})
+	}
+	mac := ret[0]["mac"].(string)
+	vmac := ret[0]["vmac"].(string)
+	log.Println("[INFO MAC]=", mac, "\t VMAC=", vmac)
 	return vmac
 }
 
-func getClusterInterfaceMac(IngressDeviceClient *NitroClient) string{
+func getClusterInterfaceMac(IngressDeviceClient *NitroClient) string {
 	gateway := getNetScalerDefaultGateway(IngressDeviceClient)
-	if (gateway == "error"){
+	if gateway == "error" {
 		return "error"
 	}
-        ifnum  := getDefaultDatewayInterface(IngressDeviceClient, gateway)
-	if (ifnum == "error"){
+	ifnum := getDefaultDatewayInterface(IngressDeviceClient, gateway)
+	if ifnum == "error" {
 		return "error"
 	}
-	VtepMac	:= getInterfaceMac(IngressDeviceClient, ifnum)
+	VtepMac := getInterfaceMac(IngressDeviceClient, ifnum)
 	return VtepMac
 }
-func getPrimaryNodeIP(IngressDeviceClient *NitroClient) string{
-	var hanode map[string]interface{}        
+func getPrimaryNodeIP(IngressDeviceClient *NitroClient) string {
+	var hanode map[string]interface{}
 	url := IngressDeviceClient.url + "hanode"
-	log.Println("[JANRAJ]",url)
-	log.Println("[JANRAJ CJ]",url)
+	log.Println("[REST URL]", url)
 
 	result, err := IngressDeviceClient.doHTTPRequest("GET", url, bytes.NewBuffer([]byte{}), readResponseHandler)
 	if err != nil {
-		log.Println("[DEBUG] go-nitro: error listing with args, trying filter")
+		log.Println("[DEBUG] GO-NITRO: error listing with args, trying filter")
 	}
-        if err = json.Unmarshal(result, &hanode); err != nil {
-                klog.Info("[JANRAJ ERROR] go-nitro: FindResourceArray: Failed to unmarshal Netscaler Response!", err, hanode)
+	if err = json.Unmarshal(result, &hanode); err != nil {
+		klog.Info("[ERROR] GO-NITRO: FindResourceArray: Failed to unmarshal Netscaler Response!", err, hanode)
 		return "error"
-        }
-        rsrcs, ok := hanode["hanode"]
-        if !ok || rsrcs == nil {
-		log.Printf("[JANRAJ ERROR]")
-                return "error"
-        }
-        resources := hanode["hanode"].([]interface{})
-        ret := make([]map[string]interface{}, len(resources), len(resources))
-        for i, v := range resources {
-                ret[i] = v.(map[string]interface{})
+	}
+	rsrcs, ok := hanode["hanode"]
+	if !ok || rsrcs == nil {
+		log.Printf("[ERROR]")
+		return "error"
+	}
+	resources := hanode["hanode"].([]interface{})
+	ret := make([]map[string]interface{}, len(resources), len(resources))
+	for i, v := range resources {
+		ret[i] = v.(map[string]interface{})
 		state := ret[i]["state"].(string)
-		if (state == "Primary") {
-			log.Println("[JANRAJ] PRIMARY", ret[i]["ipaddress"])
-			
-		}else if (state == "Secondary"){
-			log.Println("[JANRAJ] SECONDARY", ret[i]["ipaddress"])
+		if state == "Primary" {
+			log.Println("[INFO] PRIMARY", ret[i]["ipaddress"])
+
+		} else if state == "Secondary" {
+			log.Println("[INFO] SECONDARY", ret[i]["ipaddress"])
 		}
-		
-        }
+
+	}
 	return "error"
 }

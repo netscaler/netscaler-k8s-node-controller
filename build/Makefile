@@ -1,5 +1,5 @@
 OWNER=Janrajc
-IMAGE_NAME=citrix-k8s-node-controller
+IMAGE_NAME=citrix-k8s-node-controller-v2
 VERSION_FILE="../version/VERSION"
 version=1.0.0
 error=0.0.0
@@ -28,5 +28,5 @@ publish:
 
 clean:
 	docker rmi -f $$(docker images -q -f dangling=true) || true
-	docker rmi -f $$(docker images | awk '$$1 ~ /citrix-k8s-node-controller/ { print $$3}') || true
+	docker rmi -f $$(docker images | awk '$$1 ~ /citrix-k8s-node-controller-v2/ { print $$3}') || true
          
