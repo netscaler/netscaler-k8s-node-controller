@@ -1,5 +1,5 @@
 OWNER=Janrajc
-IMAGE_NAME=citrix-k8s-node-controller-v2
+IMAGE_NAME=citrix-k8s-node-controller
 VERSION_FILE="../version/VERSION"
 version=1.0.0
 error=0.0.0

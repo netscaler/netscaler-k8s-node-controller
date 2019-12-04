@@ -1,5 +1,5 @@
 FROM golang:alpine AS builder
-WORKDIR $GOPATH/src/citrix-node-controller-v2/
+WORKDIR $GOPATH/src/citrix-node-controller/
 COPY cmd/ cmd
 COPY version/ version
 COPY vendor/ vendor

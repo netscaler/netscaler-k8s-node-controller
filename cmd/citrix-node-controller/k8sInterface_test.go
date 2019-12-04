@@ -61,24 +61,6 @@ func TestConfigDecider(t *testing.T) {
 	}
 	ConfigDecider(api, nsobj, input)
 }
-func TestGenerateNextPodAddr(t *testing.T) {
-	nextIP := GenerateNextPodAddr("10.10.10.10")
-	if nextIP != "10.10.10.11" {
-		t.Error("Expected 10.10.10.11, got ", nextIP)
-	}
-	nextIP = GenerateNextPodAddr("10.10.10.244")
-	if nextIP != "10.10.10.245" {
-		t.Error("Expected 10.10.10.245, got ", nextIP)
-	}
-	nextIP = GenerateNextPodAddr("0.0.0.0")
-	if nextIP != "0.0.0.1" {
-		t.Error("Expected 0.0.0.1, got ", nextIP)
-	}
-	nextIP = GenerateNextPodAddr("10.10.10.300")
-	if nextIP != "Error" {
-		t.Error("Expected Error, got ", nextIP)
-	}
-}
 func TestHandleConfigMapAddEvent(t *testing.T) {
 	input, obj, api := getClientAndDeviceInfo()
 	HandleConfigMapAddEvent(api, obj, obj, input)
@@ -102,17 +84,4 @@ func TestHandleConfigMapUpdateEvent(t *testing.T) {
 	})
 	configobj, _ := api.Client.CoreV1().ConfigMaps("citrix").Get("citrix-node-controller", metav1.GetOptions{})
 	HandleConfigMapUpdateEvent(api, configobj, configobj, obj, input)
-}
-func TestParseNodeEvents(t *testing.T) {
-	input, nitro, api := getClientAndDeviceInfo()
-	api.Client.CoreV1().ConfigMaps("citrix").Create(&v1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{Name: "citrix-node-controller"},
-		Data:       map[string]string{"Operation": "ADD"},
-	})
-	node := api.CreateDummyNode(input)
-	ParseNodeEvents(api, node, nitro, input)
-	node.Spec.PodCIDR = ""
-	node.Labels["com.citrix.nodetype"] = "citrix"
-	ParseNodeEvents(api, node, nitro, input)
-	api.Client.CoreV1().ConfigMaps("citrix").Get("citrix-node-controller", metav1.GetOptions{})
 }
