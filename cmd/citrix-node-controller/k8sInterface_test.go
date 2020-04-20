@@ -63,25 +63,52 @@ func TestConfigDecider(t *testing.T) {
 }
 func TestHandleConfigMapAddEvent(t *testing.T) {
 	input, obj, api := getClientAndDeviceInfo()
-	HandleConfigMapAddEvent(api, obj, obj, input)
-
-}
-func TestHandleConfigMapDeleteEvent(t *testing.T) {
-	input, obj, api := getClientAndDeviceInfo()
-	api.Client.CoreV1().ConfigMaps("citrix").Create(&v1.ConfigMap{
+	api.Client.CoreV1().ConfigMaps("kube-system").Create(&v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{Name: "kube-chorus-router"},
+		Data:       map[string]string{"EndpointIP": "1.1.1.1", "CNI-1.1.1.1": "192.168.84.64/26", "Node-1.1.1.1": "1.1.1.1", "Interface-1.1.1.1": "20.20.1.1"},
+	})
+	configobj, _ := api.Client.CoreV1().ConfigMaps("kube-system").Get("kube-chorus-router", metav1.GetOptions{})
+	HandleConfigMapAddEvent(api, configobj, obj, input)
+	api.Client.CoreV1().ConfigMaps("default").Create(&v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{Name: "citrix-node-controller"},
 		Data:       map[string]string{"Operation": "ADD"},
 	})
-	configobj, _ := api.Client.CoreV1().ConfigMaps("citrix").Get("citrix-node-controller", metav1.GetOptions{})
+	configobj, _ = api.Client.CoreV1().ConfigMaps("default").Get("citrix-node-controller", metav1.GetOptions{})
+	HandleConfigMapAddEvent(api, configobj, obj, input)
+}
+func TestHandleConfigMapDeleteEvent(t *testing.T) {
+	input, obj, api := getClientAndDeviceInfo()
+	api.Client.CoreV1().ConfigMaps("kube-system").Create(&v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{Name: "kube-chorus-router"},
+		Data:       map[string]string{"EndpointIP": "1.1.1.1", "CNI-1.1.1.1": "192.168.84.64/26", "Node-1.1.1.1": "1.1.1.1", "Interface-1.1.1.1": "20.20.1.1"},
+	})
+	configobj, _ := api.Client.CoreV1().ConfigMaps("kube-system").Get("kube-chorus-router", metav1.GetOptions{})
 	input.State = NetscalerInit
+	HandleConfigMapDeleteEvent(api, configobj, obj, input)
+	api.Client.CoreV1().ConfigMaps("default").Create(&v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{Name: "citrix-node-controller"},
+		Data:       map[string]string{"Operation": "DELETE"},
+	})
+	configobj, _ = api.Client.CoreV1().ConfigMaps("default").Get("citrix-node-controller", metav1.GetOptions{})
 	HandleConfigMapDeleteEvent(api, configobj, obj, input)
 }
 func TestHandleConfigMapUpdateEvent(t *testing.T) {
 	input, obj, api := getClientAndDeviceInfo()
-	api.Client.CoreV1().ConfigMaps("citrix").Create(&v1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{Name: "citrix-node-controller"},
-		Data:       map[string]string{"Operation": "ADD"},
+	api.Client.CoreV1().ConfigMaps("kube-system").Create(&v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{Name: "kube-chorus-router"},
+		Data:       map[string]string{"EndpointIP": "1.1.1.1", "CNI-1.1.1.1": "192.168.84.64/26", "Node-1.1.1.1": "1.1.1.1", "Interface-1.1.1.1": "20.20.1.1"},
 	})
-	configobj, _ := api.Client.CoreV1().ConfigMaps("citrix").Get("citrix-node-controller", metav1.GetOptions{})
-	HandleConfigMapUpdateEvent(api, configobj, configobj, obj, input)
+	configobj, _ := api.Client.CoreV1().ConfigMaps("kube-system").Get("kube-chorus-router", metav1.GetOptions{})
+        falseVar := false
+        deleteOptions := &metav1.DeleteOptions{OrphanDependents: &falseVar}
+	api.Client.CoreV1().ConfigMaps("kube-system").Delete("kube-chorus-router", deleteOptions)
+	api.Client.CoreV1().ConfigMaps("kube-system").Create(&v1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{Name: "kube-chorus-router"},
+		Data:       map[string]string{"EndpointIP": "1.1.1.1", "CNI-1.1.1.1": "192.168.84.64/26", "Node-1.1.1.1": "1.1.1.1", "Interface-1.1.1.1": "20.20.1.1", "CNI-2.2.2.2": "192.168.84.64/26", "Node-2.2.2.2": "2.2.2.2", "Interface-2.2.2.2": "30.30.30.30"},
+	})
+	newconfigobj, _ := api.Client.CoreV1().ConfigMaps("kube-system").Get("kube-chorus-router", metav1.GetOptions{})
+        CreateK8sApiserverClient()
+	HandleConfigMapUpdateEvent(api, configobj, newconfigobj, obj, input)
+	HandleConfigMapUpdateEvent(api, newconfigobj, configobj, obj, input)
+       
 }

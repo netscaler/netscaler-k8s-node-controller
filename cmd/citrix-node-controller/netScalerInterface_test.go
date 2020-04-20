@@ -8,6 +8,7 @@ import (
 	//"net/http/httptest"
 	//"net/http/httptest"
 	"context"
+        "encoding/json" 
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -127,11 +128,18 @@ func testingHTTPClient(handler http.Handler) (*http.Client, func()) {
 	return cli, s.Close
 }
 func TestGetPrimaryNodeIP(t *testing.T) {
+        data := make(map[string]string)
+        data["hanode"] = "1.1.1.1"
+        newdata, err := json.Marshal(data)
+        if err != nil {
+            panic(err)
+        }
 	_, nitro, _ := getClientAndDeviceInfo()
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "key", r.Header.Get("Key"))
 		assert.Equal(t, "secret", r.Header.Get("Secret"))
-		w.Write([]byte("okResponse"))
+		w.WriteHeader(200)
+		w.Write([]byte(newdata))
 	})
 	httpClient, teardown := testingHTTPClient(h)
 	defer teardown()
@@ -145,7 +153,8 @@ func TestGetClusterInterfaceMac(t *testing.T) {
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "key", r.Header.Get("Key"))
 		assert.Equal(t, "secret", r.Header.Get("Secret"))
-		w.Write([]byte("okResponse"))
+		w.WriteHeader(200)
+		w.Write([]byte("body"))
 	})
 	httpClient, teardown := testingHTTPClient(h)
 	defer teardown()
@@ -158,6 +167,7 @@ func TestGetInterfaceMac(t *testing.T) {
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "key", r.Header.Get("Key"))
 		assert.Equal(t, "secret", r.Header.Get("Secret"))
+		w.WriteHeader(200)
 		w.Write([]byte("okResponse"))
 	})
 	httpClient, teardown := testingHTTPClient(h)
@@ -171,6 +181,7 @@ func TestGetDefaultDatewayInterface(t *testing.T) {
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "key", r.Header.Get("Key"))
 		assert.Equal(t, "secret", r.Header.Get("Secret"))
+		w.WriteHeader(200)
 		w.Write([]byte("okResponse"))
 	})
 	httpClient, teardown := testingHTTPClient(h)
@@ -184,6 +195,7 @@ func TestNsInterfaceConfig(t *testing.T) {
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "key", r.Header.Get("Key"))
 		assert.Equal(t, "secret", r.Header.Get("Secret"))
+		w.WriteHeader(200)
 		w.Write([]byte("okResponse"))
 	})
 	httpClient, teardown := testingHTTPClient(h)

@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -109,17 +108,6 @@ func ConfigMapInputWatcher(api *KubernetesAPIServer, IngressDeviceClient *NitroC
 	select {}
 }
 
-func CheckAndWaitForNetscalerInit(ControllerInputObj *ControllerInput) {
-	if (ControllerInputObj.State & NetscalerInit) != NetscalerInit {
-		klog.Info("[DEBUG] Waiting for NetScaler initialization to complete")
-	}
-	for {
-		if (ControllerInputObj.State & NetscalerInit) == NetscalerInit {
-			break
-		}
-	}
-}
-
 func HandleConfigMapUpdateEvent(api *KubernetesAPIServer, obj interface{}, newobj interface{}, IngressDeviceClient *NitroClient, ControllerInputObj *ControllerInput) {
 	node := new(Node)
 	ConfigMapDataNew := make(map[string]string)
@@ -203,17 +191,6 @@ func HandleConfigMapAddEvent(api *KubernetesAPIServer, obj interface{}, IngressD
 	}
 }
 
-func CLeanupHandler(api *KubernetesAPIServer, DaemonSet string, namespace string) {
-	ds, err := api.Client.AppsV1().DaemonSets(namespace).Get(DaemonSet, metav1.GetOptions{})
-	if ds != nil {
-		falseVar := false
-		deleteOptions := &metav1.DeleteOptions{OrphanDependents: &falseVar}
-		err = api.Client.AppsV1().DaemonSets(namespace).Delete(ds.Name, deleteOptions)
-	}
-	if err != nil {
-		fmt.Print(err)
-	}
-}
 
 func HandleConfigMapDeleteEvent(api *KubernetesAPIServer, obj interface{}, IngressDeviceClient *NitroClient, ControllerInputObj *ControllerInput) {
 	ControllerInputObj.CncOperation = "DELETE"
