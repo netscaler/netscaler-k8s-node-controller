@@ -13,6 +13,10 @@ import (
 var (
 	NetscalerInit      = 0x00000008
 	NetscalerTerminate = 0x00000010
+        MaxVNID            = 0xffffff  // 16777215
+        MinVNID            = 1
+        MaxPort            = 0xffff   // 65535
+        MinPort            = 1
 )
 
 // Node structure keeps the parsed information of a Node Object
@@ -125,6 +129,21 @@ func IsValidIP4(ipAddress string) bool {
 	return true
 }
 
+// This function validate given vxlan Port is valid.
+func IsValidVxlanPort(port int) bool {
+     if (port >= MinPort && port <= MaxPort) {
+         return true    
+     }
+     return false
+}
+
+// This function validate given vxlan ID is a valid as per RFC.
+func IsValidVxlanID(vni int) bool {
+     if (vni >= MinVNID && vni <= MaxVNID) {
+         return true    
+     }
+     return false
+}
 
 // FetchCitrixNodeControllerInput parses whole input provided by the user and store into controller input
 func FetchCitrixNodeControllerInput() *ControllerInput {
@@ -136,7 +155,7 @@ func FetchCitrixNodeControllerInput() *ControllerInput {
 		configError = 1
 	}
 	if !(IsValidIP4(InputDataBuff.IngressDeviceIP)) {
-		klog.Error("[ERROR] Invalid IP ")
+		klog.Error("[ERROR] Invalid IPV4 ")
 		configError = 1
 	}
 	InputDataBuff.IngressDeviceUsername = os.Getenv("NS_USER")
@@ -160,29 +179,40 @@ func FetchCitrixNodeControllerInput() *ControllerInput {
 		InputDataBuff.IngressDeviceVtepIP = InputDataBuff.IngressDeviceIP
 		configError = 1
 	}
+	if !(IsValidIP4(InputDataBuff.IngressDeviceVtepIP)) {
+		klog.Error("[ERROR] Invalid IP ")
+		configError = 1
+	}
 	VxlanPort := os.Getenv("VXLAN_PORT")
         if len(VxlanPort) == 0 {
                 fmt.Println("[ERROR] VxlanPort (VXLAN_PORT) is must for extending the route")
                 configError = 1
         }
+	InputDataBuff.VxlanPort, _ = strconv.Atoi(VxlanPort)
+    
+        if !(IsValidVxlanPort(InputDataBuff.VxlanPort)) {
+		klog.Error("[ERROR] VXLAN Port is  not in the range, Minimum value: 1, Maximum value: 65535")
+		configError = 1
+        }
+
 	InputDataBuff.IngressDeviceVxlanIDs = os.Getenv("VNID")
 	InputDataBuff.IngressDeviceVxlanID, _ = strconv.Atoi(InputDataBuff.IngressDeviceVxlanIDs)
 	if InputDataBuff.IngressDeviceVxlanID == 0 {
 		klog.Info("[ERROR] vxlan id (VNID) has Not Given")
                 configError = 1
 	}
-	
+
+        if !(IsValidVxlanID(InputDataBuff.IngressDeviceVxlanID)) {
+		klog.Error("[ERROR] VNI not in the range, Minimum value: 1, Maximum value: 16777215")
+		configError = 1
+        }
+     	
 	if configError == 1 {
 		klog.Error("Unable to get the above mentioned input from YAML")
 		panic("[ERROR] Killing Container.........Please restart Citrix Node Controller with Valid Inputs")
 	}
-	if !(IsValidIP4(InputDataBuff.IngressDeviceVtepIP)) {
-		klog.Error("[ERROR] Invalid IP ")
-		panic("[ERROR] Killing Container.........Please restart Citrix Node Controller with Valid Inputs")
-	}
 	splitString := strings.Split(InputDataBuff.IngressDevicePodCIDR, "/")
 	InputDataBuff.NodeSubnetMask = PrefixMaskTable[splitString[1]]
-	InputDataBuff.VxlanPort, _ = strconv.Atoi(VxlanPort)
 	return &InputDataBuff
 }
 
@@ -201,16 +231,3 @@ func WaitForConfigMapInput(api *KubernetesAPIServer, ControllerInputObj *Control
 	}
 }
 
-// This monitor netscaler and get network details
-func MonitorIngressDevice(IngressDeviceClient *NitroClient, ControllerInputObj *ControllerInput) {
-	vtepMac := getClusterInterfaceMac(IngressDeviceClient)
-	if vtepMac != "error" && vtepMac != "00:00:00:00:00:00" {
-		ControllerInputObj.IngressDeviceVtepMAC = vtepMac
-	} else {
-		ControllerInputObj.IngressDeviceVtepMAC = os.Getenv("NS_VTEP_MAC")
-		if len(ControllerInputObj.IngressDeviceVtepMAC) == 0 {
-			klog.Error("[ERROR] Ingress Device VtepMAC (NS_VTEP_MAC) is  required")
-			panic("[ERROR] Killing Container.........Please restart Citrix Node Controller with NS_VTEP_MAC as CNC could not get it from NS")
-		}
-	}
-}
