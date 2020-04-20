@@ -9,5 +9,8 @@ FROM quay.io/chorus/chorus-kube-router:1.8.0
 COPY --from=builder /go/bin/citrix-node-controller  /go/bin/citrix-node-controller
 COPY build/start.sh /go/bin/start.sh
 RUN ["chmod", "+x", "/go/bin/start.sh"]
-ENTRYPOINT ["sh", "/go/bin/start.sh"]
 
+#Starting CNC as nobody
+USER nobody
+
+ENTRYPOINT ["sh", "/go/bin/start.sh"]

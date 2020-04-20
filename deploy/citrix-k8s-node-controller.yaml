@@ -4,13 +4,15 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: citrix-node-controller
 rules:
-  - apiGroups: ["*"]
-    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts", "clusterroles", "clusterrolebindings"]
-    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
-
   - apiGroups: [""]
-    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts", "clusterroles", "clusterrolebindings"]
+    resources: ["configmaps", "pods"]
     verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch", "patch"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts", "clusterroles", "clusterrolebindings", "namespaces"]
+    verbs: ["get", "list", "create", "delete"]
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -31,19 +33,6 @@ kind: ServiceAccount
 metadata:
   name: citrix-node-controller
   namespace: default
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: citrix-node-controller
-  labels:
-    app: citrix-node-controller
-spec:
-  type: NodePort
-  ports:
-  - port: 8080
-  selector:
-    app: citrix-node-controller
 ---
 apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
 kind: Deployment
