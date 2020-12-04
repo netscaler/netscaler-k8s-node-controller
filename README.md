@@ -65,33 +65,7 @@ Citrix k8s node controller monitors the node events and establishes a route betw
 
 ## Get started
 
-You can run Citrix k8s node controller as:
-
--  A **microservice** inside the Kubernetes cluser.
--  A **process** outside the Kubernetes cluster.
-
->**Important:**
->
->Citrix recommends that you use Citrix k8s node controller as a **microservice** for production environments. And, as a **process** for easy development.
-  
-### Using Citrix k8s node controller as a process
-
-Before you deploy the citrix-k8s-node-controller` package, ensure that you have installed Go binary for running MIC.
-
-Perform the following:
-
-1.  Download or clone the `citrix-k8s-node-controller` package.
-
-1.  Navigate to the build directory and start the `citrix-k8s-node-controller` using the following command:
-
-        make run
-
-1.  Deploy the config map using the following command:
-
-        kubectl apply -f https://raw.githubusercontent.com/janraj/citrix-k8s-node-controller/master/deploy/config_map.yaml
-
-### Using Citrix k8s node controller as a microservice
-
+You can run Citrix k8s node controller as a **microservice** inside the Kubernetes cluser.
 Refer the [deployment](deploy/README.md) page for running Citrix k8s node controller as a microservice inside the Kubernetes cluster.
 
 ## Questions
