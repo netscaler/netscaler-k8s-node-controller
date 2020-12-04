@@ -56,7 +56,7 @@ The highlights in the screenshot show the VXLAN VNID, VXLAN PORT, SNIP, route, a
 
 1.  Delete the [config map](config_map.yaml) using the following command:
 
-	When we delete the configmap, Citrix node controller cleans up the configuration created on Citrix ADC.
+	When we delete the configmap, Citrix node controller cleans up the configuration created on Citrix ADC, the router configmap and the 2 router pods created by citrix node controller.
 
         kubectl delete -f https://raw.githubusercontent.com/citrix/citrix-k8s-node-controller/git_cnc_v2/deploy/config_map.yaml
 
