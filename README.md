@@ -68,6 +68,12 @@ Citrix k8s node controller monitors the node events and establishes a route betw
 You can run Citrix k8s node controller as a **microservice** inside the Kubernetes cluser.
 Refer the [deployment](deploy/README.md) page for running Citrix k8s node controller as a microservice inside the Kubernetes cluster.
 
+## Supported CNIs
+
+- Flannel
+- Calico (only Encapsulated IPIP mode)
+- Cilium
+
 ## Questions
 
 For questions and support the following channels are available:
