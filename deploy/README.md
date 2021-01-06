@@ -2,6 +2,8 @@
 
   This topic provides information on how to deploy Citrix node controller on Kubernetes and establish the route between Citrix ADC and Kubernetes Nodes.
 
+**NOTE:** As part of configuration, some resources will be created in the "kube-system" namespace. Hence, Please make sure that "kube-system" namespace is configurable.
+
 Perform the following:
 
 1.  Download the `citrix-k8s-node-controller.yaml` deployment file using the following command:
@@ -52,11 +54,22 @@ To verify, log on to the Citrix ADC and use the following commands to verify the
 
 The highlights in the screenshot show the VXLAN VNID, VXLAN PORT, SNIP, route, and ARP configured by Citrix node controller on the Citrix ADC.
 
+## Verify cluster deployments
+
+Apart from "citrix-node-controller" deployment, some other resources are also created.
+
+- In "Kube-system" namespace:
+    - For each worker node, a "kube-chorus-router" pod.
+    - A configmap "kube-chorus-router".
+    - A serviceaccount "kube-chorus-router"
+- A clusterrole "kube-chorus-router"
+- A clusterrolebinding "kube-chorus-router"
+
 # Delete the Citrix K8s node controller 
 
 1.  Delete the [config map](config_map.yaml) using the following command:
 
-	When we delete the configmap, Citrix node controller cleans up the configuration created on Citrix ADC, the router configmap and the 2 router pods created by citrix node controller.
+	When we delete the configmap, Citrix node controller cleans up the configuration created on Citrix ADC, the "kube-chorus-router" configmap and the "kube-chorus-router" pods created by citrix node controller.
 
         kubectl delete -f https://raw.githubusercontent.com/citrix/citrix-k8s-node-controller/git_cnc_v2/deploy/config_map.yaml
 
