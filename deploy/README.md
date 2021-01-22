@@ -52,7 +52,7 @@ After you have deployed the Citrix node controller, you can verify if Citrix nod
 
 To verify, log on to the Citrix ADC and use the following commands to verify the VXLAN VNID, VXLAN PORT, SNIP, route, and Bridgetable configured by Citrix node controller  on the Citrix ADC:
 
-![Verification](../images/ip_routes_vxlan.jpg)
+![Verification](../images/ip_route_vxlan.jpg)
 
 ![Verification](../images/bridge_table.jpg)
 
