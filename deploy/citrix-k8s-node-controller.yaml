@@ -86,5 +86,3 @@ spec:
           value: "3267"
         - name: VNID
           value: "300"
-        - name: DSR_IP_RANGE
-          value: "10.106.170.0/24"
