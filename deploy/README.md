@@ -75,7 +75,7 @@ Apart from "citrix-node-controller" deployment, some other resources are also cr
 
 1.  Delete the [config map](config_map.yaml) using the following command:
 
-	When we delete the configmap, Citrix node controller cleans up the configuration created on Citrix ADC, the "kube-cnc-router" configmap and the "kube-cnc-router" pods created by citrix node controller.
+	When we delete the configmap, Citrix node controller cleans up the configuration created on Citrix ADC, the "kube-cnc-router" configmap and the "kube-cnc-router" pods created by citrix node controller
 
         kubectl delete -f https://raw.githubusercontent.com/citrix/citrix-k8s-node-controller/git_cnc_v2/deploy/config_map.yaml
 
