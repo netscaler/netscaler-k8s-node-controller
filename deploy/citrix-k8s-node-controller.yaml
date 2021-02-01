@@ -1,6 +1,6 @@
 ---
 kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: citrix-node-controller
 rules:
@@ -22,9 +22,12 @@ rules:
   - apiGroups: ["*"]
     resources: ["serviceaccounts", "clusterroles", "clusterrolebindings", "namespaces"]
     verbs: ["get", "list", "create", "delete"]
+  - apiGroups: ["crd.projectcalico.org"]
+    resources: ["ipamblocks"]
+    verbs: ["get", "list"]
 ---
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: citrix-node-controller
 roleRef:
@@ -43,7 +46,7 @@ metadata:
   name: citrix-node-controller
   namespace: default
 ---
-apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: citrix-node-controller
@@ -60,7 +63,7 @@ spec:
       serviceAccountName: citrix-node-controller
       containers:
       - name: citrix-node-controller
-        image: "quay.io/citrix/citrix-k8s-node-controller:2.1.0"
+        image: "quay.io/citrix/citrix-k8s-node-controller:2.2.1"
         imagePullPolicy: Always
         env:
         - name: NS_IP
@@ -76,10 +79,10 @@ spec:
              name: nslogin
              key: password
         - name: NETWORK
-          value: "192.168.1.0/24"
+          value: "172.16.3.0/24"
         - name: REMOTE_VTEPIP
           value: "xx.xx.xx.xx"
         - name: VXLAN_PORT
-          value: "8472"
+          value: "3267"
         - name: VNID
-          value: "200"
+          value: "300"
