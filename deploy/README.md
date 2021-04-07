@@ -2,7 +2,7 @@
 
   This topic provides information on how to deploy Citrix node controller on Kubernetes and establish the route between Citrix ADC and Kubernetes Nodes.
 
-**NOTE:** As part of configuration, some resources will be created in the "kube-system" namespace. Hence, Please make sure that "kube-system" namespace is configurable.
+Note: CNC creates "kube-cnc-router" in HOST mode on all the schedulable-nodes. These router pods creates interface on nodes and do iptable config, hence, NET_ADMIN priviledge is required for same. Thus, CNC serviceaccount must have NET_ADMIN priviledge and ability to create HOST mode pods.
 
 Perform the following:
 
@@ -34,6 +34,7 @@ Perform the following:
     | VNID | Mandatory | A unique VXLAN VNID to create a VXLAN overlay between Kubernetes cluster and the ingress devices. </br></br>**Note:** Ensure that the VXLAN VNID that you use does not conflict with the Kubernetes cluster or Citrix ADC VXLAN VNID. You can use the `show vxlan` command on your Citrix ADC to view the VXLAN VNID. For example: </br></br> `show vxlan` </br>`1) ID: 500       Port: 9090`</br>`Done` </br> </br>In this case, ensure that you do not use `500` as the VXLAN VNID.|
     | VXLAN_PORT | Mandatory | The VXLAN port that you want to use for the overlay. </br></br>**Note:** Ensure that the VXLAN PORT that you use does not conflict with the Kubernetes cluster or Citrix ADC VXLAN PORT. You can use the `show vxlan` command on your Citrix ADC to view the VXLAN PORT. For example: </br></br> `show vxlan` </br>`1) ID: 500       Port: 9090`</br>`Done` </br> </br>In this case, ensure that you do not use `9090` as the VXLAN PORT.|
     | REMOTE_VTEPIP | Mandatory | The Ingress Citrix ADC SNIP. This IP address is used to establish an overlay network between the Kubernetes clusters.|
+    | CNI_TYPE | Mandatory | The CNI used in k8s cluster. Valid values: flannel,calico,canal,weave,cilium|
     | DSR_IP_RANGE | Optional | This IP address range is used for DSR Iptable configuration on nodes. Both IP and subnet must be specified in format : "xx.xx.xx.xx/xx" |
 
 
@@ -62,14 +63,17 @@ The highlights in the screenshot show the VXLAN VNID, VXLAN PORT, SNIP, route, a
 
 Apart from "citrix-node-controller" deployment, some other resources are also created.
 
-- In "Kube-system" namespace:
+- In the namespace where CNC was deployed:
     - For each worker node, a "kube-cnc-router" pod.
     - A configmap "kube-cnc-router".
-    - A serviceaccount "kube-cnc-router"
-- A clusterrole "kube-cnc-router"
-- A clusterrolebinding "kube-cnc-router"
 
-![Verification](../images/k8s_deployments.png)
+![Verification](../images/kube_cnc_router.png)
+
+On each of the worker nodes, a interface "cncvxlan<hash-of-namespace>" and iptables rule will get created.
+
+![Verification](../images/slave-1.png)
+![Verification](../images/slave-2.png)
+
 
 # Delete the Citrix K8s node controller 
 
