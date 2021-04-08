@@ -23,7 +23,7 @@ We can verify few things to debug the issue of services being in DOWN state.
 
    Look for any ERROR in node configuration. A typical router pod log would look like:
 
-   ![Verification](../images/router-pod-log.png)
+   <img src="images/router-pod-log.png" width="200">
 
 3. Verify kube-cnc-router configmap output using:
 
@@ -32,7 +32,7 @@ We can verify few things to debug the issue of services being in DOWN state.
    ```
    Look for Empty field in the data section of configmap. A typical 2 node data section would 
 
-   ![Verification](../images/router-cmap-data.png)
+   <img src="images/router-cmap-data.png" width="200">
 
 4. Verify Node config
    - CNC interface "cncvxlan<md5_of_namespace>" got created
@@ -42,7 +42,7 @@ We can verify few things to debug the issue of services being in DOWN state.
        - port should be same as that of vxlan created on ADC
 
    Sample:
-   ![Verification](../images/slave-1.png)
+   <img src="images/slave-1.png" width="200">
    
 
 ### Service status UP but ping from ADC not working
