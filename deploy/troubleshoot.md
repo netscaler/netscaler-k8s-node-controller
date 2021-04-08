@@ -2,6 +2,8 @@
 
 Quick help Guide for some of the common issues that may arise.
 
+To validate ADC and basic Node configurations, Refer the screenshots on [deployment](deploy/README.md) page.
+
 ### Service status DOWN
 
 We can verify few things to debug the issue of services being in DOWN state.
@@ -23,42 +25,42 @@ We can verify few things to debug the issue of services being in DOWN state.
 
    Look for any ERROR in node configuration. A typical router pod log would look like:
 
-   <img src="images/router-pod-log.png" width="200">
+   <img src="images/router-pod-log.png" width="600" height="300">
 
 3. Verify kube-cnc-router configmap output using:
 
    ```
    kubectl get configmaps -n <namespace> kube-cnc-router -o yaml
    ```
-   Look for Empty field in the data section of configmap. A typical 2 node data section would 
+   Look for Empty field in the data section of configmap. A typical 2 node data section would look like:
 
-   <img src="images/router-cmap-data.png" width="200">
+   <img src="images/router-cmap-data.png" width="600" height="300">
 
-4. Verify Node config
-   - CNC interface "cncvxlan<md5_of_namespace>" got created
-       - assigned VTEP IP same as the corresponding router gateway entry in ADC
-       - status of interface is UP and RUNNING
-   - iptable rule port got created.
+4. Verify Node config:
+   - CNC interface "cncvxlan<md5_of_namespace>" should getcreated
+       - assigned VTEP IP shoud be same as the corresponding router gateway entry in ADC
+       - status of interface should be UP and RUNNING
+   - iptable rule port should created.
        - port should be same as that of vxlan created on ADC
+       
 
-   Sample:
-   <img src="images/slave-1.png" width="200">
-   
+   <img src="images/slave-1.png" width="600" height="300">
+
 
 ### Service status UP but ping from ADC not working
 
 This is the case wherein though services are UP, still user can't do ping from ADC to the service IP. 
-One probable reason for this could be the presence of a PBR entry which directs the packets from ADC with SRCIPas NSIP to a default gateway.
-As functionally wise, it will not cause any issue, user can ping with SRCIP as ADC VTEP created by CNC. User can use "-s" option to set the SRCIP to SNIP added by CNC on ADC.
+One probable reason for this could be the presence of a PBR entry which directs the packets from ADC with SRCIP as NSIP to a default gateway.
+As functionally wise, it will not cause any issue, user if required can ping with SRCIP as ADC VTEP created by CNC. User can use "-s" option to set the SRCIP to SNIP added by CNC on ADC.
 
-Note: If its absolutely required to ping with NSIP itself, then as of now, User need to remove the PBR entry or add new PBR entry for endpoint with higher priority
+Note: If it is absolutely required to ping with NSIP itself, then as of now, User need to remove the PBR entry or add new PBR entry for endpoint with higher priority
 
-### Curl to the pod endpoint not working
+### Curl to the pod endpoint/VIP not working
 
-This is the case wherein though services are UP, still user can't curl to the pod endpoint.
-One Probable reason for this could be the ns mode "MBF" set to enable. This issue depends upon deployments andmight occur only on certain versions of ADC.
+This is the case wherein though services are UP, still user can't curl to the pod endpoint,that means, stateful TCP session to endpoint fails. 
+One Probable reason for this could be the ns mode "MBF" set to Enable. This issue depends upon deployments and might occur only on certain versions of ADC.
 
-To resolve this either:
+To resolve this, Either:
 - Disable MBF ns mode
 or
 - Bind a netprofile with netprofile Disabled to the servicegroup
@@ -67,7 +69,7 @@ Note: As of now, if disabling MBF resolves the issue, then it need to be kept di
 
 ## Customer Support
 
-As general support, while raising issue please provide following for faster debugging.
+As general support, while raising issues please provide following for faster debugging.
 
 Do a curl/ping from ADC to endpoint and do some captures.
 
@@ -83,7 +85,7 @@ For node:
    ```
 3. tcpdump capture on CNI interface lets say "vxlan.calico"
    ```
-   tcpdump -i vxlan.calic -w cni.pcap
+   tcpdump -i vxlan.calico -w cni.pcap
    ```
 4. output of "ifconfig -a" on the node.
 5. output of "iptables -L" on the node.
@@ -97,20 +99,11 @@ For ADC:
 5. show bridgetable
 6. show ns pbrs
 7. show ns bridgetable
-8. Try and capture nstrace while ping/curl:
+8. show ns mode
+9. Try and capture nstrace while ping/curl:
    ```
    start nstrace -size 0 -mode rx new_rx txb tx -capsslkeys enABLED
    ```
    ```
    stop nstrace
    ```
-
-
-
-
-
-
-
-
-
-
