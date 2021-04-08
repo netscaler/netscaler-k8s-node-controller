@@ -2,7 +2,7 @@
 
 Quick help Guide for some of the common issues that may arise.
 
-To validate ADC and basic Node configurations, Refer the screenshots on [deployment](deploy/README.md) page.
+To validate ADC and basic Node configurations, Refer the screenshots on [deployment](README.md) page.
 
 ### Service status DOWN
 
