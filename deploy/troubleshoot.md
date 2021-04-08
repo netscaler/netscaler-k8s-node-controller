@@ -32,7 +32,7 @@ We can verify few things to debug the issue of services being in DOWN state.
    ```
    Look for Empty field in the data section of configmap. A typical 2 node data section would 
 
-   <img src="images/router-cmap-data.png" width="400">
+   ![Verification](../images/router-cmap-data.png)
 
 4. Verify Node config
    - CNC interface "cncvxlan<md5_of_namespace>" got created
@@ -42,7 +42,7 @@ We can verify few things to debug the issue of services being in DOWN state.
        - port should be same as that of vxlan created on ADC
 
    Sample:
-   <img src="images/slave-1.png" width="400">
+   ![Verification](../images/slave-1.png)
    
 
 ### Service status UP but ping from ADC not working
