@@ -1,8 +1,8 @@
-# Troubleshoot Guide
+# Troubleshoot guide
 
 Quick help Guide for some of the common issues that may arise.
 
-To validate ADC and basic Node configurations, Refer the screenshots on [deployment](README.md) page.
+To validate Citrix ADC and basic node configurations, Refer screenshots on [deployment](README.md) page.
 
 ### Service status DOWN
 
@@ -14,8 +14,8 @@ We can verify few things to debug the issue of services being in DOWN state.
    kubectl logs <cnc-pod> -n <namespace>
    ```
 
-   Look for any "permission" ERRORs in logs. As stated in deployment page, CNC creates "kube-cnc-router" pods    which need NET_ADMIN priviledge to do the configurations on nodes. So, CNC serviceaccount must have 
-   NET_ADMIN priviledge and the ability to create HOST mode "kube-cnc-router" pods.
+   Look for any "permission" ERRORs in logs. As stated in deployment page, CNC creates "kube-cnc-router" pods    which need NET_ADMIN privilege to do the configurations on nodes. So, CNC serviceaccount must have 
+   NET_ADMIN privilege and the ability to create HOST mode "kube-cnc-router" pods.
 
 2. Verify logs of kube-cnc-router pod using:
 
@@ -49,11 +49,15 @@ We can verify few things to debug the issue of services being in DOWN state.
 
 ### Service status UP but ping from ADC not working
 
-This is the case wherein though services are UP, still user can't do ping from ADC to the service IP. 
+It is possible that user is unable to ping service IP from Citrix ADC even though services are in UP state.
 One probable reason for this could be the presence of a PBR entry which directs the packets from ADC with SRCIP as NSIP to a default gateway.
-As functionally wise, it will not cause any issue, user if required can ping with SRCIP as ADC VTEP created by CNC. User can use "-s" option to set the SRCIP to SNIP added by CNC on ADC.
+It doesn't impact any functionality. User can ping with Citrix ADC's VTEP as source IP using -S option of ping command from Citrix ADC CLI prompt as seen below.
 
-Note: If it is absolutely required to ping with NSIP itself, then as of now, User need to remove the PBR entry or add new PBR entry for endpoint with higher priority
+   ```
+   ping <serviceIP> -S <vtepIP>
+   ```
+
+Note: If it is absolutely required to ping with NSIP itself, then as of now, user need to remove the PBR entry or add new PBR entry for endpoint with higher priority
 
 ### Curl to the pod endpoint/VIP not working
 
