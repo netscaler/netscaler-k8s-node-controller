@@ -71,8 +71,8 @@ Apart from "citrix-node-controller" deployment, some other resources are also cr
 
 On each of the worker nodes, a interface "cncvxlan<hash-of-namespace>" and iptables rule will get created.
 
-<img src="../images/slave-1.png" width="600" height="300">
-<img src="../images/slave-2.png" width="600" height="300">
+<img src="../images/worker-1.png" width="600" height="300">
+<img src="../images/worker-2.png" width="600" height="300">
 
 
 # Delete the Citrix K8s node controller 

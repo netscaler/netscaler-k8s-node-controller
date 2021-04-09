@@ -44,7 +44,7 @@ We can verify few things to debug the issue of services being in DOWN state.
        - port should be same as that of vxlan created on ADC
        
 
-   <img src="../images/slave-1.png" width="600" height="300">
+   <img src="../images/worker-1.png" width="600" height="300">
 
 
 ### Service status UP but ping from ADC not working
