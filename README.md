@@ -78,7 +78,7 @@ Refer the [deployment](deploy/README.md) page for running Citrix k8s node contro
 
 ## TroubleShoot
 
-After deploying CNC, if services are in DOWN state, refer the [troubleshooting](deploy/troubleshoot.md) page
+After deploying CNC, in case of any issue, refer the [troubleshooting](deploy/troubleshoot.md) page
 
 ## Questions
 
