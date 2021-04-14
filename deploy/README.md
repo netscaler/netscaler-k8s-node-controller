@@ -2,7 +2,7 @@
 
   This topic provides information on how to deploy Citrix node controller on Kubernetes and establish the route between Citrix ADC and Kubernetes Nodes.
 
-**NOTE:** As part of configuration, some resources will be created in the "kube-system" namespace. Hence, Please make sure that "kube-system" namespace is configurable.
+Note: CNC creates "kube-cnc-router" in HOST mode on all the schedulable-nodes. These router pods create virtual network interface and program iptables accordingly on respective nodes where they are scheduled. These pods need to run with NET_ADMIN capability to achieve the same. Hence CNC serviceaccount must have NET_ADMIN privilege and ability to create HOST mode pods.
 
 Perform the following:
 
@@ -28,12 +28,13 @@ Perform the following:
 
     | Environment Variable | Mandatory or Optional | Description |
     | -------------------- | --------------------- | ----------- |
-    | NS_IP | Mandatory | Citrix k8s node controller uses this IP address to configure the Citrix ADC. The NS_IP can be anyone of the following: </br></br> - **NSIP** for standalone Citrix ADC </br>- **SNIP** for high availability deployments (Ensure that management access is enabled) </br> - **CLIP** for Cluster deployments |
+    | NS_IP | Mandatory | Citrix kubernetes node controller uses this IP address to configure the Citrix ADC. The NS_IP can be anyone of the following: </br></br> - **NSIP** for standalone Citrix ADC </br>- **SNIP** for high availability deployments (Ensure that management access is enabled) </br> - **CLIP** for Cluster deployments |
     | NS_USER and NS_PASSWORD | Mandatory | The user name and password of Citrix ADC. Citrix k8s node controller uses these credentials to authenticate with Citrix ADC. You can either provide the user name and password or Kubernetes secrets. If you want to use a non-default Citrix ADC user name and password, you can [create a system user account in Citrix ADC](https://developer-docs.citrix.com/projects/citrix-k8s-ingress-controller/en/latest/deploy/deploy-cic-yaml/#create-system-user-account-for-citrix-ingress-controller-in-citrix-adc). </br></br> The deployment file uses Kubernetes secrets, create a secret for the user name and password using the following command: </br></br> `kubectl create secret  generic nslogin --from-literal=username='nsroot' --from-literal=password='nsroot'` </br></br> **Note**: If you want to use a different secret name other than `nslogin`, ensure that you update the `name` field in the `citrix-node-controller` definition. |
     | NETWORK | Mandatory | The IP address range (for example, `192.128.1.0/24`) that Citrix node controller uses to configure the VTEP overlay end points on the Kubernetes nodes. </br></br> **Note:** Ensure that the subnet that you provide is different from your Kubernetes cluster.|
     | VNID | Mandatory | A unique VXLAN VNID to create a VXLAN overlay between Kubernetes cluster and the ingress devices. </br></br>**Note:** Ensure that the VXLAN VNID that you use does not conflict with the Kubernetes cluster or Citrix ADC VXLAN VNID. You can use the `show vxlan` command on your Citrix ADC to view the VXLAN VNID. For example: </br></br> `show vxlan` </br>`1) ID: 500       Port: 9090`</br>`Done` </br> </br>In this case, ensure that you do not use `500` as the VXLAN VNID.|
     | VXLAN_PORT | Mandatory | The VXLAN port that you want to use for the overlay. </br></br>**Note:** Ensure that the VXLAN PORT that you use does not conflict with the Kubernetes cluster or Citrix ADC VXLAN PORT. You can use the `show vxlan` command on your Citrix ADC to view the VXLAN PORT. For example: </br></br> `show vxlan` </br>`1) ID: 500       Port: 9090`</br>`Done` </br> </br>In this case, ensure that you do not use `9090` as the VXLAN PORT.|
     | REMOTE_VTEPIP | Mandatory | The Ingress Citrix ADC SNIP. This IP address is used to establish an overlay network between the Kubernetes clusters.|
+    | CNI_TYPE | Mandatory | The CNI used in kubernetes cluster. Valid values: flannel,calico,canal,weave,cilium|
     | DSR_IP_RANGE | Optional | This IP address range is used for DSR Iptable configuration on nodes. Both IP and subnet must be specified in format : "xx.xx.xx.xx/xx" |
 
 
@@ -62,14 +63,17 @@ The highlights in the screenshot show the VXLAN VNID, VXLAN PORT, SNIP, route, a
 
 Apart from "citrix-node-controller" deployment, some other resources are also created.
 
-- In "Kube-system" namespace:
+- In the namespace where CNC was deployed:
     - For each worker node, a "kube-cnc-router" pod.
     - A configmap "kube-cnc-router".
-    - A serviceaccount "kube-cnc-router"
-- A clusterrole "kube-cnc-router"
-- A clusterrolebinding "kube-cnc-router"
 
-![Verification](../images/k8s_deployments.png)
+<img src="../images/kube_cnc_router.png" width="600" height="300">
+
+On each of the worker nodes, a interface "cncvxlan<hash-of-namespace>" and iptables rule will get created.
+
+<img src="../images/worker-1.png" width="600" height="300">
+<img src="../images/worker-2.png" width="600" height="300">
+
 
 # Delete the Citrix K8s node controller 
 

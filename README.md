@@ -70,9 +70,15 @@ Refer the [deployment](deploy/README.md) page for running Citrix k8s node contro
 
 ## Supported CNIs
 
-- Flannel
-- Calico (only Encapsulated IPIP mode)
-- Cilium
+- flannel
+- calico 
+- cilium
+- weave
+- canal
+
+## TroubleShoot
+
+After deploying CNC, if services are in DOWN state, refer the [troubleshooting](deploy/troubleshoot.md) page
 
 ## Questions
 
