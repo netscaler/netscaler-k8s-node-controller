@@ -4,6 +4,18 @@ This document explains how to troubleshoot issues that you may encounter while u
 
 To validate Citrix ADC and the basic node configurations, refer to the image on the [deployment](README.md) page.
 
+### Router pods not starting
+If kube-cnc-router pods are not starting, then, this could be due to certain cluster restrictions wherein privileged pods cannot be deployed by non-admin users/privileges.
+
+As a workaround, there are 2 options:
+1) Use "kube-system" namespace to deploy CNC
+
+OR
+
+2) Assign "cluster-admin" role to CNC clusterrolebinding.
+
+Note: If option 1) is chosen, then one cannot create multipe instances of CNC in a single cluster as we only have one kube-system namespace available per cluster.
+
 ### Service status DOWN
 
 To debug the issues when the service is in down state,
