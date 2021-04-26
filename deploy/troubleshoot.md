@@ -9,7 +9,9 @@ If kube-cnc-router pods are not starting, then, this could be due to certain clu
 
 As a workaround, there are 2 options:
 1) Use "kube-system" namespace to deploy CNC
-or
+
+OR
+
 2) Assign "cluster-admin" role to CNC clusterrolebinding.
 
 Note: If option 1) is chosen, then one cannot create multipe instances of CNC in a single cluster as we only have one kube-system namespace available per cluster.
