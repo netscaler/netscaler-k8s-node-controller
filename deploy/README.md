@@ -36,6 +36,7 @@ Perform the following:
     | REMOTE_VTEPIP | Mandatory | The Ingress Citrix ADC SNIP. This IP address is used to establish an overlay network between the Kubernetes clusters.|
     | CNI_TYPE | Mandatory | The CNI used in kubernetes cluster. Valid values: flannel,calico,canal,weave,cilium|
     | DSR_IP_RANGE | Optional | This IP address range is used for DSR Iptable configuration on nodes. Both IP and subnet must be specified in format : "xx.xx.xx.xx/xx" |
+    | CLUSTER_NAME | Optional | N/A | Unique identifier for the kubernetes cluster on which CNC is deployed. If Provided CNC will configure PolicyBasedRoutes instead of static Routes. For details, see [CNC-PBR-SUPPORT](https://github.com/citrix/citrix-k8s-ingress-controller/tree/master/docs/how-to/pbr.md#configure-pbr-using-the-citrix-node-controller) |
 
 
 1.  After you have updated the Citrix k8s node controller deployment YAML file, deploy it using the following command:
