@@ -36,8 +36,8 @@ Perform the following:
     | REMOTE_VTEPIP | Mandatory | The Ingress Citrix ADC SNIP. This IP address is used to establish an overlay network between the Kubernetes clusters.|
     | CNI_TYPE | Mandatory | The CNI used in kubernetes cluster. Valid values: flannel,calico,canal,weave,cilium|
     | DSR_IP_RANGE | Optional | This IP address range is used for DSR Iptable configuration on nodes. Both IP and subnet must be specified in format : "xx.xx.xx.xx/xx" |
-    | CLUSTER_NAME | Optional | N/A | Unique identifier for the kubernetes cluster on which CNC is deployed. If Provided CNC will configure PolicyBasedRoutes instead of static Routes. For details, see [CNC-PBR-SUPPORT](https://github.com/citrix/citrix-k8s-ingress-controller/tree/master/docs/how-to/pbr.md#configure-pbr-using-the-citrix-node-controller) |
-
+    | CLUSTER_NAME | Optional | Unique identifier for the kubernetes cluster on which CNC is deployed. If Provided CNC will configure PolicyBasedRoutes instead of static Routes. For details, see [CNC-PBR-SUPPORT](https://github.com/citrix/citrix-k8s-ingress-controller/tree/master/docs/how-to/pbr.md#configure-pbr-using-the-citrix-node-controller) |
+    | CNC_ROUTER_IMAGE | Optional | Specifies the internal repository image to be used for `kube-cnc-router` helper pods when Internet access is disabled on cluster nodes. For more details, see [running-cnc-without-internet-access](#running-citrix-node-controller-without-internet-access) |
 
 1.  After you have updated the Citrix k8s node controller deployment YAML file, deploy it using the following command:
 
@@ -88,3 +88,27 @@ On each of the worker nodes, a interface "cncvxlan<hash-of-namespace>" and iptab
 1.  Delete the Citrix node controller using the following command:
 
         kubectl delete -f citrix-k8s-node-controller.yaml
+
+## Running Citrix Node Controller without Internet access
+
+Citrix node controller internally creates helper pods (`kube-cnc-router` pods) on each Kubernetes cluster node. The image used by default is `quay.io/citrix/cnc-router:1.1.0` which requires Internet access. If the Kubernetes nodes do not have internet access, creation of `kube-cnc-router` pods fails.
+ 
+However, Citrix provides a way to access the image from your internal repository so that you can run the Citrix node controller without internet access. Using the `CNC_ROUTER_IMAGE` environment variable, you can point to the internal repository image of `quay.io/citrix/cnc-router:1.1.0`.
+
+### Configuring Citrix node controller to use an image from the internal repository
+
+When you deploy Citrix node controller specify the ` CNC_ROUTER_IMAGE` environment variable and set the value of the variable as your internal repository path for the image `quay.io/citrix/cnc-router:1.1.0`.
+
+When you specify this environment variable, Citrix node controller uses the internal repository image provided via the `CNC_ROUTER_IMAGE` environment variable to create the `kube-cnc-router` helper pods. If the environment variable is not provided, it uses the default image ` quay.io/citrix/cnc-router:1.1.0`  which requires internet access.
+
+Following example shows how to specify the `CNC_ROUTER_IMAGE` environment variable while deploying Citrix node controller. 
+
+- While	deploying Citrix node controller using the YAML file, set the value of the environment variable in the YAML file as follows: 
+
+              - name: CNC_ROUTER_IMAGE
+                value: "docker.xyz.com/adc/citrix/cnc-router:1.1.0"
+
+- While	deploying Citrix node controller using Helm charts, provide the following in values.yaml:
+
+               cncRouterImage: "docker.xyz.com/adc/citrix/cnc-router:1.1.0"
+
