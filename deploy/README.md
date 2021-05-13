@@ -39,6 +39,7 @@ Perform the following:
     | CLUSTER_NAME | Optional | Unique identifier for the kubernetes cluster on which CNC is deployed. If Provided CNC will configure PolicyBasedRoutes instead of static Routes. For details, see [CNC-PBR-SUPPORT](https://github.com/citrix/citrix-k8s-ingress-controller/tree/master/docs/how-to/pbr.md#configure-pbr-using-the-citrix-node-controller) |
     | CNC_ROUTER_IMAGE | Optional | Specifies the internal repository image to be used for `kube-cnc-router` helper pods when Internet access is disabled on cluster nodes. For more details, see [running-cnc-without-internet-access](#running-citrix-node-controller-without-internet-access) |
 
+
 1.  After you have updated the Citrix k8s node controller deployment YAML file, deploy it using the following command:
 
         kubectl create -f citrix-k8s-node-controller.yaml
