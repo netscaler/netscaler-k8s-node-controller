@@ -71,7 +71,7 @@ Refer the [deployment](deploy/README.md) page for running Citrix k8s node contro
 ## Supported CNIs
 
 - flannel
-- calico 
+- calico (Vxlan/IPIP modes)
 - cilium
 - weave
 - canal
