@@ -37,8 +37,9 @@ Perform the following:
     | CNI_TYPE | Mandatory | The CNI used in kubernetes cluster. Valid values: flannel,calico,canal,weave,cilium|
     | DSR_IP_RANGE | Optional | This IP address range is used for DSR Iptable configuration on nodes. Both IP and subnet must be specified in format : "xx.xx.xx.xx/xx" |
     | CLUSTER_NAME | Optional | Unique identifier for the kubernetes cluster on which CNC is deployed. If Provided CNC will configure PolicyBasedRoutes instead of static Routes. For details, see [CNC-PBR-SUPPORT](https://github.com/citrix/citrix-k8s-ingress-controller/tree/master/docs/how-to/pbr.md#configure-pbr-using-the-citrix-node-controller) |
+    | CNC_CONFIGMAP | Optional | Specifies the ConfigMapName that Citrix-Node-Controller will watch for. The delete event of this ConfigMap will trigger deletion of `kube-cnc-router` helper pods and related config from the ADC. Defaults to `citrix-node-controller` if not provided. For more details, see [deleting-configurations](#delete-the-citrix-k8s-node-controller)| 
     | CNC_ROUTER_IMAGE | Optional | Specifies the internal repository image to be used for `kube-cnc-router` helper pods when Internet access is disabled on cluster nodes. For more details, see [running-cnc-without-internet-access](#running-citrix-node-controller-without-internet-access) |
-
+    | CNC_ROUTER_NAME | Optional | Specifies the RBAC, ServiceAccount, ConfigMap Name, and Pod Prefix used for `kube-cnc-router` helper pods. Defaults to `kube-cnc-router` if not provided. For more details, see [running-multiple-cnc-in-same-cluster](#running-multiple-citrix-node-controller-in-the-same-cluster) |
 
 1.  After you have updated the Citrix k8s node controller deployment YAML file, deploy it using the following command:
 
@@ -113,3 +114,16 @@ Following example shows how to specify the `CNC_ROUTER_IMAGE` environment variab
 
                cncRouterImage: "docker.xyz.com/adc/citrix/cnc-router:1.1.0"
 
+###  Running Multiple Citrix Node Controller in the same cluster
+
+When you deploy citrix-k8s-node-controller.yaml, the RBAC and ServiceAccount for `kube-cnc-router` helper pods is created with default value of `kube-cnc-router`.
+If you want to deploy multiple Citrix-Node-Controller in the same cluster, use a different name for these entities in each YAML file and provide this name as environment variable to CNC using `CNC_ROUTER_NAME`.
+
+Following example shows how to specify the `CNC_ROUTER_NAME` environment variable while deploying Citrix node controller via YAML file.
+
+- First, replace the name of ClusterRole/ClusterRoleBinding/ServiceAccount that gets created for `kube-cnc-router` helper pods with a unique name like "someother-rbac-for-kube-cnc-router"
+
+- Set the value of the environment variable in the YAML file as follows:
+
+              - name: CNC_ROUTER_NAME
+                value: "someother-rbac-for-kube-cnc-router"
