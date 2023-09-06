@@ -4,7 +4,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: citrix-node-controller
 rules:
-  - apiGroups: [""]
+  - apiGroups: ["*"]
     resources: ["configmaps", "pods"]
     verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
   - apiGroups: ["*"]
@@ -37,13 +37,47 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: citrix-node-controller
-  namespace: citrix-system
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: citrix-node-controller
-  namespace: citrix-system
+  namespace: default
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kube-cnc-router
+rules:
+  - apiGroups: ["*"]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
+  - apiGroups: ["crd.projectcalico.org"]
+    resources: ["ipamblocks"]
+    verbs: ["get", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kube-cnc-router
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-cnc-router
+subjects:
+- kind: ServiceAccount
+  name: kube-cnc-router
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-cnc-router
+  namespace: default
 ---
 apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
 kind: Deployment
