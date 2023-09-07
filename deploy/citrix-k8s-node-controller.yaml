@@ -7,7 +7,7 @@ rules:
   - apiGroups: ["*"]
     resources: ["configmaps", "pods"]
     verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
-  - apiGroups: [""]
+  - apiGroups: ["*"]
     resources: ["configmaps", "pods"]
     verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
   - apiGroups: [""]
@@ -38,7 +38,6 @@ subjects:
 - kind: ServiceAccount
   name: citrix-node-controller
   namespace: default
-apiVersion: rbac.authorization.k8s.io/v1
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -73,54 +72,61 @@ subjects:
 - kind: ServiceAccount
   name: kube-cnc-router
   namespace: default
-apiVersion: rbac.authorization.k8s.io/v1
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kube-cnc-router
   namespace: default
-
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
 kind: Deployment
 metadata:
-  name: citrix-node-controller
+  name: cnc-citrix-node-controller
+  namespace: citrix-system
 spec:
   selector:
     matchLabels:
-      app: citrix-node-controller
+      app.kubernetes.io/name: citrix-node-controller
+      app.kubernetes.io/instance: cnc
   replicas: 1
   template:
     metadata:
       labels:
-        app: citrix-node-controller
+        app.kubernetes.io/name: citrix-node-controller
+        app.kubernetes.io/instance: cnc
     spec:
       serviceAccountName: citrix-node-controller
       containers:
       - name: citrix-node-controller
-        image: "quay.io/citrix/citrix-k8s-node-controller:2.2.10"
+        image: "quay.io/citrix/citrix-k8s-node-controller:2.2.11"
         imagePullPolicy: Always
         env:
+        - name: EULA
+          value: "yes"
         - name: NS_IP
           value: "xxxxxxx"
         - name: NS_USER
           valueFrom:
             secretKeyRef:
-             name: nslogin
-             key: username
+              name: nslogin
+              key: username
         - name: NS_PASSWORD
           valueFrom:
             secretKeyRef:
-             name: nslogin
-             key: password
+              name: nslogin
+              key: password
         - name: NETWORK
-          value: "172.16.3.0/24"
+          value: "172.18.3.0/24"
         - name: REMOTE_VTEPIP
-          value: "xx.xx.xx.xx"
-        - name: VXLAN_PORT
-          value: "3267"
+          value: "xx.xx.xx.yy"
         - name: VNID
-          value: "300"
+          value: "175"
+        - name: VXLAN_PORT
+          value: "8472"
         - name: CNI_TYPE
-          value: "xxxx"
+          value: <CNI-NAME like calico, flannel>
+        - name: "CNC_ROUTER_NAME"
+          value: kube-cnc-router
+        - name: "CNC_CONFIGMAP"
+          value: citrix-node-controller
