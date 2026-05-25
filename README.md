@@ -68,6 +68,8 @@ Citrix k8s node controller monitors the node events and establishes a route betw
 You can run Citrix k8s node controller as a **microservice** inside the Kubernetes cluser.
 Refer the [deployment](deploy/README.md) page for running Citrix k8s node controller as a microservice inside the Kubernetes cluster.
 
+> **What's new in 3.0.0:** OVN-Kubernetes CNI support for OpenShift 4.x clusters. See [OVN-CNI support for OpenShift](deploy/ovn-cni-openshift.md) for the OpenShift-specific deployment guide. The default node controller image has been updated to `quay.io/netscaler/citrix-k8s-node-controller:3.0.0`.
+
 ## Supported CNIs
 
 - flannel
@@ -75,6 +77,7 @@ Refer the [deployment](deploy/README.md) page for running Citrix k8s node contro
 - cilium
 - weave
 - canal
+- ovn (OpenShift 4.x) — supported from release `3.0.0`. See [OVN-CNI support for OpenShift](deploy/ovn-cni-openshift.md) for deployment details.
 
 ## TroubleShoot
 

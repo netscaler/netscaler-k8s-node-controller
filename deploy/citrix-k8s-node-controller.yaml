@@ -98,7 +98,7 @@ spec:
       serviceAccountName: citrix-node-controller
       containers:
       - name: citrix-node-controller
-        image: "quay.io/citrix/citrix-k8s-node-controller:2.2.12"
+        image: "quay.io/netscaler/netscaler-k8s-node-controller:3.0.0"
         imagePullPolicy: Always
         env:
         - name: EULA
@@ -124,7 +124,7 @@ spec:
         - name: VXLAN_PORT
           value: "8472"
         - name: CNI_TYPE
-          value: <CNI-NAME like calico, flannel>
+          value: <CNI-NAME like calico, flannel, ovn>
         - name: "CNC_ROUTER_NAME"
           value: kube-cnc-router
         - name: "CNC_CONFIGMAP"
