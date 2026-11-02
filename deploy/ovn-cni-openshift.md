@@ -51,10 +51,10 @@ Update the image references in `citrix-k8s-node-controller.yaml`:
 
 ```yaml
 # Node controller
-image: quay.io/netscaler/netscaler-k8s-node-controller:3.0.0
+image: quay.io/netscaler/netscaler-k8s-node-controller:3.2.13
 
 # Router pod (set via CNC_ROUTER_IMAGE env or input)
-image: quay.io/netscaler/nsnc-router:2.0.0
+image: quay.io/netscaler/nsnc-router:2.2.9
 ```
 
 Deploy:

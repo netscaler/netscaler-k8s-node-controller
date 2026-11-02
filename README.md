@@ -68,7 +68,9 @@ Citrix k8s node controller monitors the node events and establishes a route betw
 You can run Citrix k8s node controller as a **microservice** inside the Kubernetes cluser.
 Refer the [deployment](deploy/README.md) page for running Citrix k8s node controller as a microservice inside the Kubernetes cluster.
 
-> **What's new in 3.0.0:** OVN-Kubernetes CNI support for OpenShift 4.x clusters. See [OVN-CNI support for OpenShift](deploy/ovn-cni-openshift.md) for the OpenShift-specific deployment guide. The default node controller image has been updated to `quay.io/netscaler/citrix-k8s-node-controller:3.0.0`.
+> **What's new in 3.2.13:** NetScaler Node Controller can read its NetScaler credentials from files that a HashiCorp Vault Agent sidecar writes, and reload a rotated credential without a pod restart. See [Use NetScaler credentials stored in a Vault server with NetScaler Node Controller](https://docs.netscaler.com/us/en/netscaler-k8s-ingress-controller/configure/network/node-controller-vault-credentials.html). The default node controller image is `quay.io/netscaler/netscaler-k8s-node-controller:3.2.13`.
+>
+> **What's new in 3.0.0:** OVN-Kubernetes CNI support for OpenShift 4.x clusters. See [OVN-CNI support for OpenShift](deploy/ovn-cni-openshift.md) for the OpenShift-specific deployment guide.
 
 ## Supported CNIs
 

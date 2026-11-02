@@ -40,6 +40,9 @@ Perform the following:
     | CNC_CONFIGMAP | Optional | Specifies the ConfigMapName that Citrix-Node-Controller will watch for. The delete event of this ConfigMap will trigger deletion of `kube-cnc-router` helper pods and related config from the ADC. Defaults to `citrix-node-controller` if not provided. For more details, see [deleting-configurations](#delete-the-citrix-k8s-node-controller)| 
     | CNC_ROUTER_IMAGE | Optional | Specifies the internal repository image to be used for `kube-cnc-router` helper pods when Internet access is disabled on cluster nodes. For more details, see [running-cnc-without-internet-access](#running-citrix-node-controller-without-internet-access) |
     | CNC_ROUTER_NAME | Optional | Specifies the RBAC, ServiceAccount, ConfigMap Name, and Pod Prefix used for `kube-cnc-router` helper pods. Defaults to `kube-cnc-router` if not provided. For more details, see [running-multiple-cnc-in-same-cluster](#running-multiple-citrix-node-controller-in-the-same-cluster) |
+    | NS_SECRET_DIR | Optional | The directory where NetScaler Node Controller reads the NetScaler credentials from the files `username` and `password`, for example `/etc/citrix`, when a Vault Agent sidecar writes them. When the files are present, they are used instead of `NS_USER` and `NS_PASSWORD`, and a rotated credential is reloaded without a pod restart. Requires NetScaler Node Controller 3.2.13 or later. For more information, see [Use NetScaler credentials stored in a Vault server with NetScaler Node Controller](https://docs.netscaler.com/us/en/netscaler-k8s-ingress-controller/configure/network/node-controller-vault-credentials.html). |
+    | NS_CREDENTIAL_WAIT_SECONDS | Optional | Seconds NetScaler Node Controller waits at start-up for the credential files in `NS_SECRET_DIR`, for example `120`. `0` means no wait. Requires NetScaler Node Controller 3.2.13 or later. |
+    | NS_CRED_RELOAD_INTERVAL | Optional | How often, in seconds, NetScaler Node Controller checks the credential files for a new credential. Default: `30`. Requires NetScaler Node Controller 3.2.13 or later. |
 
 1.  After you have updated the Citrix k8s node controller deployment YAML file, deploy it using the following command:
 
@@ -93,26 +96,26 @@ On each of the worker nodes, a interface "cncvxlan<hash-of-namespace>" and iptab
 
 ## Running Citrix Node Controller without Internet access
 
-Citrix node controller internally creates helper pods (`kube-cnc-router` pods) on each Kubernetes cluster node. The image used by default is `quay.io/citrix/cnc-router:1.1.0` which requires Internet access. If the Kubernetes nodes do not have internet access, creation of `kube-cnc-router` pods fails.
+Citrix node controller internally creates helper pods (`kube-cnc-router` pods) on each Kubernetes cluster node. The image used by default is `quay.io/netscaler/nsnc-router:2.2.9` which requires Internet access. If the Kubernetes nodes do not have internet access, creation of `kube-cnc-router` pods fails.
  
-However, Citrix provides a way to access the image from your internal repository so that you can run the Citrix node controller without internet access. Using the `CNC_ROUTER_IMAGE` environment variable, you can point to the internal repository image of `quay.io/citrix/cnc-router:1.1.0`.
+However, Citrix provides a way to access the image from your internal repository so that you can run the Citrix node controller without internet access. Using the `CNC_ROUTER_IMAGE` environment variable, you can point to the internal repository image of `quay.io/netscaler/nsnc-router:2.2.9`.
 
 ### Configuring Citrix node controller to use an image from the internal repository
 
-When you deploy Citrix node controller specify the ` CNC_ROUTER_IMAGE` environment variable and set the value of the variable as your internal repository path for the image `quay.io/citrix/cnc-router:1.1.0`.
+When you deploy Citrix node controller specify the ` CNC_ROUTER_IMAGE` environment variable and set the value of the variable as your internal repository path for the image `quay.io/netscaler/nsnc-router:2.2.9`.
 
-When you specify this environment variable, Citrix node controller uses the internal repository image provided via the `CNC_ROUTER_IMAGE` environment variable to create the `kube-cnc-router` helper pods. If the environment variable is not provided, it uses the default image ` quay.io/citrix/cnc-router:1.1.0`  which requires internet access.
+When you specify this environment variable, Citrix node controller uses the internal repository image provided via the `CNC_ROUTER_IMAGE` environment variable to create the `kube-cnc-router` helper pods. If the environment variable is not provided, it uses the default image `quay.io/netscaler/nsnc-router:2.2.9` which requires internet access.
 
 Following example shows how to specify the `CNC_ROUTER_IMAGE` environment variable while deploying Citrix node controller. 
 
 - While	deploying Citrix node controller using the YAML file, set the value of the environment variable in the YAML file as follows: 
 
               - name: CNC_ROUTER_IMAGE
-                value: "docker.xyz.com/adc/citrix/cnc-router:1.1.0"
+                value: "docker.xyz.com/adc/netscaler/nsnc-router:2.2.9"
 
 - While	deploying Citrix node controller using Helm charts, provide the following in values.yaml:
 
-               cncRouterImage: "docker.xyz.com/adc/citrix/cnc-router:1.1.0"
+               nsncRouterImage: "docker.xyz.com/adc/netscaler/nsnc-router:2.2.9"
 
 ###  Running Multiple Citrix Node Controller in the same cluster
 
